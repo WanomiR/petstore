@@ -1,0 +1,12 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Petstore API implementation",
+        "title": "Petstore",
+        "contact": {},
+        "version": "1.0.0"
+    },
+    "host": "localhost:8888",
+    "basePath": "/",
+    "paths": {}
+}
