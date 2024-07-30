@@ -2,6 +2,8 @@ package app
 
 import (
 	"backend/internal/lib/e"
+	"backend/internal/lib/rr"
+	"backend/internal/modules"
 	"backend/internal/repository"
 	"backend/internal/repository/dbrepo"
 	"database/sql"
@@ -34,14 +36,14 @@ type Server interface {
 }
 
 type App struct {
-	Host       string
-	Port       string
-	server     *http.Server
-	signalChan chan os.Signal
-	DSN        string
-	DB         repository.Repository
-	// services
-	// controllers
+	Host        string
+	Port        string
+	server      *http.Server
+	signalChan  chan os.Signal
+	DSN         string
+	DB          repository.Repository
+	services    *modules.Services
+	controllers *modules.Controllers
 }
 
 func NewApp() (a *App, err error) {
@@ -103,8 +105,13 @@ func (a *App) init() error {
 	if err != nil {
 		return err
 	}
-	log.Println("Connected to database")
 	a.DB = dbrepo.NewPostgresDBRepo(conn)
+
+	a.services = modules.NewServices(a.DB)
+	a.controllers = modules.NewControllers(
+		a.services,
+		rr.NewReadRespond(rr.WithMaxBytes(1<<10)),
+	)
 
 	a.server = &http.Server{
 		Addr:         ":" + a.Port,
@@ -138,6 +145,17 @@ func (a *App) routes() *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Recoverer)
+
+	r.Route("/pet", func(r chi.Router) {
+		// TODO: apply authentication here
+
+		r.Get("/{petId}", a.controllers.Pet.GetById)
+		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
+		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
+		r.Post("/{petId}/uploadImage", a.controllers.Pet.UploadImage)
+		r.Post("/", a.controllers.Pet.UpdatePet)
+		r.Get("/findByStatus", a.controllers.Pet.GetByStatus)
+	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("http://%s:%s/swagger/doc.json", a.Host, a.Port)),
