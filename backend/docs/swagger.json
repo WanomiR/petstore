@@ -48,6 +48,51 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Update pet provided pet id and form data",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pet"
+                ],
+                "summary": "update pet",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pet ID",
+                        "name": "petId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pet name",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pet status",
+                        "name": "status",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
             }
         }
     },

@@ -49,6 +49,17 @@ func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
 	_ = c.rr.WriteJSON(w, 200, pet)
 }
 
+// UpdateWithForm godoc
+// @Summary update pet
+// @Description Update pet provided pet id and form data
+// @Tags pet
+// @Produce json
+// @Param petId path int true "Pet ID"
+// @Param name formData string false "Pet name"
+// @Param status formData string false "Pet status"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 405 {object} rr.JSONResponse
+// @Router /pet/{petId} [post]
 func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 	//TODO implement me
 	panic("implement me")

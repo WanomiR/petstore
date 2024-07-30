@@ -81,4 +81,34 @@ paths:
       summary: get pet by id
       tags:
       - pet
+    post:
+      description: Update pet provided pet id and form data
+      parameters:
+      - description: Pet ID
+        in: path
+        name: petId
+        required: true
+        type: integer
+      - description: Pet name
+        in: formData
+        name: name
+        type: string
+      - description: Pet status
+        in: formData
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: update pet
+      tags:
+      - pet
 swagger: "2.0"

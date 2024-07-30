@@ -20,11 +20,11 @@ type PhotoUrl struct {
 
 type Pet struct {
 	Id        int      `json:"id,int"`
-	Category  Category `json:"category"`
+	Category  Category `json:"category" binding:"required" example:"cat"`
 	Name      string   `json:"name" binding:"required" example:"doggy"`
 	PhotoUrls []string `json:"photoUrls" binding:"required"`
 	Tags      []Tag    `json:"tags"`
-	Status    string   `json:"status" example:"active"` // available | pending | sold
+	Status    string   `json:"status" binding:"required" example:"active"` // available | pending | sold
 }
 
 type Order struct {
