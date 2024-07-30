@@ -7,16 +7,21 @@ import (
 	"net/http"
 )
 
+const (
+	typeError   = "error"
+	typeSuccess = "success"
+)
+
 type ReadResponder interface {
 	ReadJSON(w http.ResponseWriter, r *http.Request, data any) error
 	WriteJSON(w http.ResponseWriter, status int, data any, headers ...http.Header) error
 	WriteJSONError(w http.ResponseWriter, err error, status ...int) error
 }
 
-type JSONResponse struct {
-	Error   bool   `json:"error"`
-	Message string `json:"message,omitempty"`
-	Data    any    `json:"data,omitempty"`
+type ApiResponse struct {
+	Code    int    `json:"code"`
+	Type    string `json:"type"` // error | success
+	Message string `json:"message"`
 }
 
 type ReadRespond struct {
@@ -76,15 +81,11 @@ func (rr *ReadRespond) WriteJSON(w http.ResponseWriter, status int, data any, he
 
 func (rr *ReadRespond) WriteJSONError(w http.ResponseWriter, err error, status ...int) error {
 
-	statusCode := http.StatusBadRequest
+	response := ApiResponse{Code: http.StatusBadRequest, Type: typeError, Message: err.Error()}
+
 	if len(status) > 0 {
-		statusCode = status[0]
+		response.Code = status[0]
 	}
 
-	response := &JSONResponse{
-		Error:   true,
-		Message: err.Error(),
-	}
-
-	return rr.WriteJSON(w, statusCode, response)
+	return rr.WriteJSON(w, response.Code, response)
 }

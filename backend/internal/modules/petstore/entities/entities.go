@@ -12,6 +12,12 @@ type Tag struct {
 	Name string `json:"name"`
 }
 
+type PhotoUrl struct {
+	Id    int    `json:"id,int"`
+	PetId int    `json:"pet_id,int"`
+	Url   string `json:"url"`
+}
+
 type Pet struct {
 	Id        int      `json:"id,int"`
 	Category  Category `json:"category"`
