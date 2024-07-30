@@ -1,9 +1,12 @@
 package service
 
-import "backend/internal/modules/pet/entities"
+import (
+	"backend/internal/modules/pet/entities"
+	"context"
+)
 
 type PetServicer interface {
-	GetById(id int) (entities.Pet, error)
+	GetById(ctx context.Context, id int) (entities.Pet, error)
 	UpdateWithForm(id int, name string, status string) error
 	DeleteById(id int) error
 	UploadImage(id int) error

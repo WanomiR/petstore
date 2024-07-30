@@ -1,8 +1,10 @@
 package service
 
 import (
+	"backend/internal/lib/e"
 	"backend/internal/modules/pet/entities"
 	"backend/internal/repository"
+	"context"
 )
 
 type PetService struct {
@@ -13,37 +15,42 @@ func NewPetService(db repository.Repository) *PetService {
 	return &PetService{DB: db}
 }
 
-func (p *PetService) GetById(id int) (entities.Pet, error) {
+func (s *PetService) GetById(ctx context.Context, id int) (pet entities.Pet, err error) {
+	defer func() { err = e.WrapIfErr("couldn't get pet", err) }()
+
+	if pet, err = s.DB.GetPetById(ctx, id); err != nil {
+		return entities.Pet{}, err
+	}
+
+	return pet, nil
+}
+
+func (s *PetService) UpdateWithForm(id int, name string, status string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *PetService) UpdateWithForm(id int, name string, status string) error {
+func (s *PetService) DeleteById(id int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *PetService) DeleteById(id int) error {
+func (s *PetService) UploadImage(id int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *PetService) UploadImage(id int) error {
+func (s *PetService) Create(pet entities.Pet) (int, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *PetService) Create(pet entities.Pet) (int, error) {
+func (s *PetService) Update(pet entities.Pet) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (p *PetService) Update(pet entities.Pet) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (p *PetService) GetByStatus(status string) ([]entities.Pet, error) {
+func (s *PetService) GetByStatus(status string) ([]entities.Pet, error) {
 	//TODO implement me
 	panic("implement me")
 }

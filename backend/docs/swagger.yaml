@@ -1,9 +1,84 @@
 basePath: /
+definitions:
+  entities.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  entities.Pet:
+    properties:
+      category:
+        $ref: '#/definitions/entities.Category'
+      id:
+        type: integer
+      name:
+        example: doggy
+        type: string
+      photoUrls:
+        items:
+          type: string
+        type: array
+      status:
+        description: available | pending | sold
+        example: active
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/entities.Tag'
+        type: array
+    required:
+    - name
+    - photoUrls
+    type: object
+  entities.Tag:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  rr.JSONResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
 host: localhost:8888
 info:
   contact: {}
   description: Petstore API implementation
   title: Petstore
   version: 1.0.0
-paths: {}
+paths:
+  /pet/{petId}:
+    get:
+      description: Return pet object provided pet id
+      parameters:
+      - description: Pet ID
+        in: path
+        name: petId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Pet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: get pet by id
+      tags:
+      - pet
 swagger: "2.0"
