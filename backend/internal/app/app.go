@@ -158,6 +158,18 @@ func (a *App) routes() *chi.Mux {
 		r.Get("/findByStatus", a.controllers.Pet.GetByStatus)
 	})
 
+	r.Route("/user", func(r chi.Router) {
+
+		r.Get("/{username}", a.controllers.User.GetByUsername)
+		r.Put("/{username}", a.controllers.User.Update)
+		r.Delete("/{username}", a.controllers.User.Delete)
+		r.Get("/login", a.controllers.User.Login)
+		r.Get("/logout", a.controllers.User.Logout)
+		r.Post("/createWithArray", a.controllers.User.CreateWithArray)
+		//r.Post("/createWithList", nil)
+		r.Post("/", a.controllers.User.Create)
+	})
+
 	r.Get("/swagger/*", httpSwagger.Handler(
 		httpSwagger.URL(fmt.Sprintf("http://%s:%s/swagger/doc.json", a.Host, a.Port)),
 	))
