@@ -62,7 +62,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create pet
+      description: Add a new pet to the store
       parameters:
       - description: Pet object that needs to be added to the store
         in: body
@@ -84,9 +84,38 @@ paths:
       summary: create pet
       tags:
       - pet
+    put:
+      consumes:
+      - application/json
+      description: Update an existing pet
+      parameters:
+      - description: Pet object that needs to be added to the store
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: update pet
+      tags:
+      - pet
   /pet/{petId}:
     delete:
-      description: Delete pet provided pet id
+      description: Deletes a pet
       parameters:
       - description: Pet ID
         in: path
@@ -112,7 +141,7 @@ paths:
       tags:
       - pet
     get:
-      description: Return pet object provided pet id
+      description: Find pet by ID
       parameters:
       - description: Pet ID
         in: path
@@ -138,7 +167,7 @@ paths:
       tags:
       - pet
     post:
-      description: Update pet provided pet id and form data
+      description: Updates a pet in the store with form data
       parameters:
       - description: Pet ID
         in: path
@@ -169,7 +198,7 @@ paths:
       - pet
   /pet/{petId}/uploadImage:
     post:
-      description: Upload pet image
+      description: Uploads an image
       parameters:
       - description: Pet ID
         in: path

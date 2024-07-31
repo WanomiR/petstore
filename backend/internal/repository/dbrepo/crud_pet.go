@@ -6,7 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"log"
 )
 
 func (db *PostgresDBRepo) GetPetById(ctx context.Context, petId int) (entities.Pet, error) {
@@ -17,11 +16,9 @@ func (db *PostgresDBRepo) GetPetById(ctx context.Context, petId int) (entities.P
 	query := `SELECT id, category_id, name, status FROM pets WHERE id = $1 AND is_deleted = FALSE`
 
 	var pet entities.Pet
-	var categoryId int
-
 	err := db.conn.QueryRowContext(ctx, query, petId).Scan(
 		&pet.Id,
-		&categoryId,
+		&pet.Category.Id,
 		&pet.Name,
 		&pet.Status,
 	)
@@ -30,21 +27,6 @@ func (db *PostgresDBRepo) GetPetById(ctx context.Context, petId int) (entities.P
 		return entities.Pet{}, errors.New("pet not found")
 	} else if err != nil {
 		return entities.Pet{}, e.Wrap("failed to execute query", err)
-	}
-
-	// get pet category
-	if pet.Category, err = db.GetPetCategoryById(ctx, categoryId); err != nil {
-		return pet, e.Wrap("failed to get pet category", err)
-	}
-
-	// get pet photo urls
-	if pet.PhotoUrls, err = db.GetPhotoUrlsByPetId(ctx, pet.Id); err != nil {
-		return pet, e.Wrap("failed to get photo urls", err)
-	}
-
-	// get pet tags
-	if pet.Tags, err = db.GetTagsByPetId(ctx, pet.Id); err != nil {
-		return pet, e.Wrap("failed to get pet tags", err)
 	}
 
 	return pet, nil
@@ -63,6 +45,19 @@ func (db *PostgresDBRepo) CreatePet(ctx context.Context, categoryId int, petName
 	}
 
 	return petId, nil
+}
+
+func (db *PostgresDBRepo) UpdatePet(ctx context.Context, pet entities.Pet) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `UPDATE pets SET category_id = $1, name = $2, status = $3 WHERE id = $4`
+
+	if _, err := db.conn.ExecContext(ctx, query, pet.Category.Id, pet.Name, pet.Status, pet.Id); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
 }
 
 func (db *PostgresDBRepo) DeletePet(ctx context.Context, petId int) error {
@@ -164,25 +159,52 @@ func (db *PostgresDBRepo) CreatePetPhotoUrl(ctx context.Context, petId int, phot
 	return nil
 }
 
-func (db *PostgresDBRepo) GetPetTagIdsByPetId(ctx context.Context, petId int) ([]int, error) {
-	query := `SELECT tag_id FROM pet_tags WHERE pet_id = $1`
+func (db *PostgresDBRepo) GetTagById(ctx context.Context, tagId int) (entities.Tag, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
 
-	rows, err := db.conn.QueryContext(ctx, query, petId)
-	if err != nil {
-		return nil, e.Wrap("failed to execute query", err)
-	}
-	defer rows.Close()
+	query := `SELECT id, name FROM tags WHERE id = $1`
 
-	tagIds := make([]int, 0)
-	for rows.Next() {
-		var tag int
-		if err = rows.Scan(&tag); err != nil {
-			return nil, e.Wrap("failed to scan row", err)
-		}
-		tagIds = append(tagIds, tag)
+	var tag entities.Tag
+	if err := db.conn.QueryRowContext(ctx, query, tagId).Scan(&tag.Id, &tag.Name); errors.Is(err, sql.ErrNoRows) {
+		return entities.Tag{}, errors.New("tag not found")
+	} else if err != nil {
+		return entities.Tag{}, e.Wrap("failed to execute query", err)
 	}
 
-	return tagIds, nil
+	return tag, nil
+}
+
+func (db *PostgresDBRepo) GetTagByName(ctx context.Context, tagName string) (entities.Tag, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `SELECT id, name FROM tags WHERE name = $1`
+
+	var tag entities.Tag
+	if err := db.conn.QueryRowContext(ctx, query, tagName).Scan(&tag.Id, &tag.Name); errors.Is(err, sql.ErrNoRows) {
+		return entities.Tag{}, errors.New("tag not found")
+	} else if err != nil {
+		return entities.Tag{}, e.Wrap("failed to execute query", err)
+	}
+
+	return tag, nil
+}
+
+func (db *PostgresDBRepo) CreateTag(ctx context.Context, tagName string) (entities.Tag, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `INSERT INTO tags(name) VALUES ($1) returning id`
+
+	var tagId int
+	if err := db.conn.QueryRowContext(ctx, query, tagName).Scan(&tagId); err != nil {
+		return entities.Tag{}, e.Wrap("failed to execute query", err)
+	}
+
+	tag := entities.Tag{Id: tagId, Name: tagName}
+
+	return tag, nil
 }
 
 func (db *PostgresDBRepo) GetPetTagPair(ctx context.Context, petId int, tagId int) (entities.PetTag, error) {
@@ -203,6 +225,30 @@ func (db *PostgresDBRepo) GetPetTagPair(ctx context.Context, petId int, tagId in
 	return petTag, nil
 }
 
+func (db *PostgresDBRepo) GetPetTagPairsByPetId(ctx context.Context, petId int) ([]entities.PetTag, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `SELECT id, pet_id, tag_id FROM pet_tags WHERE pet_id = $1`
+
+	rows, err := db.conn.QueryContext(ctx, query, petId)
+	if err != nil {
+		return nil, e.Wrap("failed to execute query", err)
+	}
+	defer rows.Close()
+
+	petTagPairs := make([]entities.PetTag, 0)
+	for rows.Next() {
+		var petTag entities.PetTag
+		if err = rows.Scan(&petTag.Id, &petTag.PetId, &petTag.TagId); err != nil {
+			return nil, e.Wrap("failed to scan row", err)
+		}
+		petTagPairs = append(petTagPairs, petTag)
+	}
+
+	return petTagPairs, nil
+}
+
 func (db *PostgresDBRepo) CreatePetTagPair(ctx context.Context, petId int, tagId int) (entities.PetTag, error) {
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
@@ -217,69 +263,4 @@ func (db *PostgresDBRepo) CreatePetTagPair(ctx context.Context, petId int, tagId
 	petTag := entities.PetTag{Id: petTagId, PetId: petId, TagId: tagId}
 
 	return petTag, nil
-}
-
-func (db *PostgresDBRepo) GetTagsByPetId(ctx context.Context, petId int) ([]entities.Tag, error) {
-	tagIds, err := db.GetPetTagIdsByPetId(ctx, petId)
-	if err != nil {
-		return nil, e.Wrap("failed to get pet tags", err)
-	}
-
-	query := `SELECT id, name FROM tags WHERE id = $1`
-	tags := make([]entities.Tag, 0)
-
-	for _, tagId := range tagIds {
-		var tag entities.Tag
-		if err = db.conn.QueryRowContext(ctx, query, tagId).Scan(&tag.Id, &tag.Name); err != nil {
-			log.Println(e.Wrap("failed to execute tags query", err).Error())
-			continue
-		}
-		tags = append(tags, tag)
-	}
-
-	return tags, nil
-}
-
-func (db *PostgresDBRepo) GetTagByName(ctx context.Context, tagName string) (entities.Tag, error) {
-	ctx, cancel := context.WithTimeout(ctx, db.timeout)
-	defer cancel()
-
-	query := `SELECT id, name FROM tags WHERE name = $1`
-
-	var tag entities.Tag
-	if err := db.conn.QueryRowContext(ctx, query, tagName).Scan(&tag.Id, &tag.Name); errors.Is(err, sql.ErrNoRows) {
-		return entities.Tag{}, errors.New("tag not found")
-	} else if err != nil {
-		return entities.Tag{}, e.Wrap("failed to execute query", err)
-	}
-
-	return tag, nil
-}
-func (db *PostgresDBRepo) CreateTag(ctx context.Context, tagName string) (entities.Tag, error) {
-	ctx, cancel := context.WithTimeout(ctx, db.timeout)
-	defer cancel()
-
-	query := `INSERT INTO tags(name) VALUES ($1) returning id`
-
-	var tagId int
-	if err := db.conn.QueryRowContext(ctx, query, tagName).Scan(&tagId); err != nil {
-		return entities.Tag{}, e.Wrap("failed to execute query", err)
-	}
-
-	tag := entities.Tag{Id: tagId, Name: tagName}
-
-	return tag, nil
-}
-
-func (db *PostgresDBRepo) UpdatePet(ctx context.Context, pet entities.Pet) error {
-	ctx, cancel := context.WithTimeout(ctx, db.timeout)
-	defer cancel()
-
-	query := `UPDATE pets SET category_id = $1, name = $2, status = $3 WHERE id = $4`
-
-	if _, err := db.conn.ExecContext(ctx, query, pet.Category.Id, pet.Name, pet.Status, pet.Id); err != nil {
-		return e.Wrap("failed to execute query", err)
-	}
-
-	return nil
 }

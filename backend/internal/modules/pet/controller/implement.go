@@ -25,7 +25,7 @@ func NewPetControl(service service.PetServicer, readResponder rr.ReadResponder) 
 
 // GetById godoc
 // @Summary get pet by id
-// @Description Return pet object provided pet id
+// @Description Find pet by ID
 // @Tags pet
 // @Produce json
 // @Param petId path int true "Pet ID"
@@ -53,7 +53,7 @@ func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
 
 // UpdateWithForm godoc
 // @Summary update pet
-// @Description Update pet provided pet id and form data
+// @Description Updates a pet in the store with form data
 // @Tags pet
 // @Produce json
 // @Param petId path int true "Pet ID"
@@ -93,7 +93,7 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 
 // DeleteById godoc
 // @Summary delete pet
-// @Description Delete pet provided pet id
+// @Description Deletes a pet
 // @Tags pet
 // @Produce json
 // @Param petId path int true "Pet ID"
@@ -121,7 +121,7 @@ func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
 
 // UploadImage godoc
 // @Summary upload image
-// @Description Upload pet image
+// @Description Uploads an image
 // @Tags pet
 // @Produce json
 // @Param petId path int true "Pet ID"
@@ -158,7 +158,7 @@ func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
 
 // CreatePet godoc
 // @Summary create pet
-// @Description Create pet
+// @Description Add a new pet to the store
 // @Tags pet
 // @Accept json
 // @Produce json
@@ -181,9 +181,32 @@ func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// UpdatePet godoc
+// @Summary update pet
+// @Description Update an existing pet
+// @Tags pet
+// @Accept json
+// @Produce json
+// @Param body body entities.Pet true "Pet object that needs to be added to the store"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400,404 {object} rr.JSONResponse
+// @Router /pet [put]
 func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	var pet entities.Pet
+	_ = c.rr.ReadJSON(w, r, &pet)
+
+	if _, err := c.service.GetById(r.Context(), pet.Id); err != nil {
+		_ = c.rr.WriteJSONError(w, err, 404)
+		return
+	}
+
+	if err := c.service.Update(r.Context(), pet); err != nil {
+		_ = c.rr.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{Error: false, Message: "pet updated"}
+	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
 func (c *PetControl) GetByStatus(w http.ResponseWriter, r *http.Request) {

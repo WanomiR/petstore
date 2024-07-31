@@ -6,6 +6,7 @@ import (
 	"backend/internal/repository"
 	"context"
 	"errors"
+	"log"
 )
 
 type PetService struct {
@@ -21,6 +22,33 @@ func (s *PetService) GetById(ctx context.Context, id int) (pet entities.Pet, err
 
 	if pet, err = s.DB.GetPetById(ctx, id); err != nil {
 		return entities.Pet{}, err
+	}
+
+	// get pet category
+	if pet.Category, err = s.DB.GetPetCategoryById(ctx, pet.Category.Id); err != nil {
+		return pet, e.Wrap("failed to get pet category", err)
+	}
+
+	// get pet photo urls
+	if pet.PhotoUrls, err = s.DB.GetPhotoUrlsByPetId(ctx, pet.Id); err != nil {
+		return pet, e.Wrap("failed to get photo urls", err)
+	}
+
+	// get pet tag pairs
+	petTagPairs, err := s.DB.GetPetTagPairsByPetId(ctx, pet.Id)
+	if err != nil {
+		return entities.Pet{}, e.Wrap("failed to get pet tag pairs", err)
+	}
+
+	// get tags for current pet
+	pet.Tags = make([]entities.Tag, 0)
+	for _, pt := range petTagPairs {
+		var tag entities.Tag
+		if tag, err = s.DB.GetTagById(ctx, pt.TagId); err != nil {
+			log.Println("failed to get tag", err.Error())
+			continue
+		}
+		pet.Tags = append(pet.Tags, tag)
 	}
 
 	return pet, nil
@@ -100,7 +128,7 @@ func (s *PetService) Create(ctx context.Context, pet entities.Pet) (int, error) 
 			// use tag id if tag exists
 			pet.Tags[i] = tag
 		} else {
-			// otherwise create new tag
+			// otherwise create a new tag
 			if tag, err = s.DB.CreateTag(ctx, pet.Tags[i].Name); err != nil {
 				return 0, e.Wrap("couldn't create pet tag", err)
 			}

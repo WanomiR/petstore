@@ -16,8 +16,52 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/pet": {
+            "put": {
+                "description": "Update an existing pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pet"
+                ],
+                "summary": "update pet",
+                "parameters": [
+                    {
+                        "description": "Pet object that needs to be added to the store",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Pet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Create pet",
+                "description": "Add a new pet to the store",
                 "consumes": [
                     "application/json"
                 ],
@@ -57,7 +101,7 @@ const docTemplate = `{
         },
         "/pet/{petId}": {
             "get": {
-                "description": "Return pet object provided pet id",
+                "description": "Find pet by ID",
                 "produces": [
                     "application/json"
                 ],
@@ -96,7 +140,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Update pet provided pet id and form data",
+                "description": "Updates a pet in the store with form data",
                 "produces": [
                     "application/json"
                 ],
@@ -141,7 +185,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete pet provided pet id",
+                "description": "Deletes a pet",
                 "produces": [
                     "application/json"
                 ],
@@ -182,7 +226,7 @@ const docTemplate = `{
         },
         "/pet/{petId}/uploadImage": {
             "post": {
-                "description": "Upload pet image",
+                "description": "Uploads an image",
                 "produces": [
                     "application/json"
                 ],
