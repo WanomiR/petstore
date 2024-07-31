@@ -92,8 +92,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/rr.JSONResponse"
                         }
                     },
-                    "405": {
-                        "description": "Method Not Allowed",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/rr.JSONResponse"
                         }
@@ -110,15 +110,18 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "cat"
                 }
             }
         },
         "entities.Pet": {
             "type": "object",
             "required": [
+                "category",
                 "name",
-                "photoUrls"
+                "photoUrls",
+                "status"
             ],
             "properties": {
                 "category": {
@@ -157,7 +160,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "fluffy"
                 }
             }
         },

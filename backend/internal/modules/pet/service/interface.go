@@ -7,10 +7,10 @@ import (
 
 type PetServicer interface {
 	GetById(ctx context.Context, id int) (entities.Pet, error)
-	UpdateWithForm(id int, name string, status string) error
-	DeleteById(id int) error
-	UploadImage(id int) error
-	Create(pet entities.Pet) (int, error)
-	Update(pet entities.Pet) error
-	GetByStatus(status string) ([]entities.Pet, error)
+	UpdateWithForm(ctx context.Context, id int, name string, status string) error
+	DeleteById(ctx context.Context, id int) error
+	UploadImage(ctx context.Context, id int) error
+	Create(ctx context.Context, pet entities.Pet) (int, error)
+	Update(ctx context.Context, pet entities.Pet) error
+	GetByStatus(ctx context.Context, status string) ([]entities.Pet, error)
 }

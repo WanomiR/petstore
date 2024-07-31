@@ -5,6 +5,7 @@ definitions:
       id:
         type: integer
       name:
+        example: cat
         type: string
     type: object
   entities.Pet:
@@ -29,14 +30,17 @@ definitions:
           $ref: '#/definitions/entities.Tag'
         type: array
     required:
+    - category
     - name
     - photoUrls
+    - status
     type: object
   entities.Tag:
     properties:
       id:
         type: integer
       name:
+        example: fluffy
         type: string
     type: object
   rr.JSONResponse:
@@ -104,8 +108,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/rr.JSONResponse'
-        "405":
-          description: Method Not Allowed
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/rr.JSONResponse'
       summary: update pet

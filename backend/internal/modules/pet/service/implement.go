@@ -25,32 +25,47 @@ func (s *PetService) GetById(ctx context.Context, id int) (pet entities.Pet, err
 	return pet, nil
 }
 
-func (s *PetService) UpdateWithForm(id int, name string, status string) error {
+func (s *PetService) UpdateWithForm(ctx context.Context, id int, name string, status string) error {
+	pet, err := s.GetById(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if name != "" {
+		pet.Name = name
+	}
+	if status != "" {
+		pet.Status = status
+	}
+
+	if err = s.DB.UpdatePet(ctx, pet); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *PetService) DeleteById(ctx context.Context, id int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *PetService) DeleteById(id int) error {
+func (s *PetService) UploadImage(ctx context.Context, id int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *PetService) UploadImage(id int) error {
+func (s *PetService) Create(ctx context.Context, pet entities.Pet) (int, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *PetService) Create(pet entities.Pet) (int, error) {
+func (s *PetService) Update(ctx context.Context, pet entities.Pet) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *PetService) Update(pet entities.Pet) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s *PetService) GetByStatus(status string) ([]entities.Pet, error) {
+func (s *PetService) GetByStatus(ctx context.Context, status string) ([]entities.Pet, error) {
 	//TODO implement me
 	panic("implement me")
 }

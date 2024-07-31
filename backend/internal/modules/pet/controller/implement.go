@@ -58,11 +58,35 @@ func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
 // @Param name formData string false "Pet name"
 // @Param status formData string false "Pet status"
 // @Success 200 {object} rr.JSONResponse
-// @Failure 405 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
 // @Router /pet/{petId} [post]
 func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[len(parts)-1]
+
+	petId, err := strconv.Atoi(id)
+	if err != nil {
+		_ = c.rr.WriteJSONError(w, errors.New("invalid id supplied"))
+		return
+	}
+
+	_ = r.ParseForm()
+	name := r.FormValue("name")
+	status := r.FormValue("status")
+
+	if name == "" && status == "" {
+		_ = c.rr.WriteJSONError(w, errors.New("at least one field must be not empty"))
+		return
+	}
+
+	if err = c.service.UpdateWithForm(r.Context(), petId, name, status); err != nil {
+		_ = c.rr.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{Error: false, Message: "pet updated"}
+	_ = c.rr.WriteJSON(w, 200, resp)
+
 }
 
 func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {

@@ -129,3 +129,16 @@ func (db *PostgresDBRepo) GetPetTagsById(ctx context.Context, petId int) ([]enti
 
 	return tags, nil
 }
+
+func (db *PostgresDBRepo) UpdatePet(ctx context.Context, pet entities.Pet) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `UPDATE pets SET category_id = $1, name = $2, status = $3 WHERE id = $4`
+
+	if _, err := db.conn.ExecContext(ctx, query, pet.Category.Id, pet.Name, pet.Status, pet.Id); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
+}

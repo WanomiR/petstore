@@ -4,23 +4,23 @@ import "time"
 
 type Category struct {
 	Id   int    `json:"id,int"`
-	Name string `json:"name"`
+	Name string `json:"name" example:"cat"`
 }
 
 type Tag struct {
 	Id   int    `json:"id,int"`
-	Name string `json:"name"`
+	Name string `json:"name" example:"fluffy"`
 }
 
 type PhotoUrl struct {
 	Id    int    `json:"id,int"`
-	PetId int    `json:"pet_id,int"`
+	PetId int    `json:"petId,int"`
 	Url   string `json:"url"`
 }
 
 type Pet struct {
 	Id        int      `json:"id,int"`
-	Category  Category `json:"category" binding:"required" example:"cat"`
+	Category  Category `json:"category" binding:"required"`
 	Name      string   `json:"name" binding:"required" example:"doggy"`
 	PhotoUrls []string `json:"photoUrls" binding:"required"`
 	Tags      []Tag    `json:"tags"`
