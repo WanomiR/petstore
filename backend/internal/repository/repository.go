@@ -1,33 +1,40 @@
 package repository
 
 import (
-	"backend/internal/modules/pet/entities"
+	pe "backend/internal/modules/pet/entities"
+	ue "backend/internal/modules/user/entities"
 	"context"
 	"database/sql"
 )
 
 type Repository interface {
 	Connection() *sql.DB
+	UserRepository
 	PetRepository
 }
 
+type UserRepository interface {
+	GetUserByUsername(ctx context.Context, username string) (ue.User, error)
+	UpdateUser(ctx context.Context, user ue.User) error
+}
+
 type PetRepository interface {
-	GetPetById(ctx context.Context, petId int) (entities.Pet, error)
+	GetPetById(ctx context.Context, petId int) (pe.Pet, error)
 	CreatePet(ctx context.Context, categoryId int, petName string, petStatus string) (int, error)
-	UpdatePet(ctx context.Context, pet entities.Pet) error
+	UpdatePet(ctx context.Context, pet pe.Pet) error
 	DeletePet(ctx context.Context, petId int) error
-	GetPetsByStatus(ctx context.Context, petStatus string) ([]entities.Pet, error)
-	GetPetCategoryById(ctx context.Context, categoryId int) (entities.Category, error)
-	GetPetCategoryByName(ctx context.Context, categoryName string) (entities.Category, error)
-	CreatePetCategory(ctx context.Context, categoryName string) (entities.Category, error)
-	GetPhotoUrlsByPetId(ctx context.Context, petId int) ([]entities.PhotoUrl, error)
+	GetPetsByStatus(ctx context.Context, petStatus string) ([]pe.Pet, error)
+	GetPetCategoryById(ctx context.Context, categoryId int) (pe.Category, error)
+	GetPetCategoryByName(ctx context.Context, categoryName string) (pe.Category, error)
+	CreatePetCategory(ctx context.Context, categoryName string) (pe.Category, error)
+	GetPhotoUrlsByPetId(ctx context.Context, petId int) ([]pe.PhotoUrl, error)
 	DeletePhotoUrlsByPetId(ctx context.Context, petId int) error
 	CreatePetPhotoUrl(ctx context.Context, petId int, photoUrl string) error
-	GetTagById(ctx context.Context, tagId int) (entities.Tag, error)
-	GetTagByName(ctx context.Context, tagName string) (entities.Tag, error)
-	CreateTag(ctx context.Context, tagName string) (entities.Tag, error)
-	GetPetTagPair(ctx context.Context, petId int, tagId int) (entities.PetTag, error)
-	GetPetTagPairsByPetId(ctx context.Context, petId int) ([]entities.PetTag, error)
+	GetTagById(ctx context.Context, tagId int) (pe.Tag, error)
+	GetTagByName(ctx context.Context, tagName string) (pe.Tag, error)
+	CreateTag(ctx context.Context, tagName string) (pe.Tag, error)
+	GetPetTagPair(ctx context.Context, petId int, tagId int) (pe.PetTag, error)
+	GetPetTagPairsByPetId(ctx context.Context, petId int) ([]pe.PetTag, error)
 	DeletePetTagsByPetId(ctx context.Context, petId int) error
-	CreatePetTagPair(ctx context.Context, petId int, tagId int) (entities.PetTag, error)
+	CreatePetTagPair(ctx context.Context, petId int, tagId int) (pe.PetTag, error)
 }

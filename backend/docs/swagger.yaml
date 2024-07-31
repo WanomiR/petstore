@@ -42,6 +42,32 @@ definitions:
         example: fluffy
         type: string
     type: object
+  entities.User:
+    properties:
+      email:
+        example: johndoe@example.com
+        type: string
+      firstName:
+        example: John
+        type: string
+      id:
+        type: integer
+      lastName:
+        example: Doe
+        type: string
+      password:
+        example: "123456"
+        type: string
+      phone:
+        example: 7-999-999-99-99
+        type: string
+      userStatus:
+        example: 0
+        type: integer
+      username:
+        example: johndoe001
+        type: string
+    type: object
   rr.JSONResponse:
     properties:
       data: {}
@@ -260,4 +286,65 @@ paths:
       summary: get pets by status
       tags:
       - pet
+  /user/{username}:
+    get:
+      description: Get user by username
+      parameters:
+      - description: The name that needs to be fetched
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: get user
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Updated user
+      parameters:
+      - description: Name that need to be updated
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: Updated user object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: update user
+      tags:
+      - user
 swagger: "2.0"

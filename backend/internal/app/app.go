@@ -147,8 +147,7 @@ func (a *App) routes() *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	r.Route("/pet", func(r chi.Router) {
-		// TODO: apply authentication here
-
+		// TODO: apply authorization here
 		r.Get("/{petId}", a.controllers.Pet.GetById)
 		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
 		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
@@ -159,15 +158,18 @@ func (a *App) routes() *chi.Mux {
 	})
 
 	r.Route("/user", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			// TODO: apply authorization here
+			r.Get("/{username}", a.controllers.User.GetByUsername)
+			r.Put("/{username}", a.controllers.User.Update)
+			r.Get("/logout", a.controllers.User.Logout)
+			r.Delete("/{username}", a.controllers.User.Delete)
+		})
 
-		r.Get("/{username}", a.controllers.User.GetByUsername)
-		r.Put("/{username}", a.controllers.User.Update)
-		r.Delete("/{username}", a.controllers.User.Delete)
 		r.Get("/login", a.controllers.User.Login)
-		r.Get("/logout", a.controllers.User.Logout)
+		r.Post("/", a.controllers.User.Create)
 		r.Post("/createWithArray", a.controllers.User.CreateWithArray)
 		//r.Post("/createWithList", nil)
-		r.Post("/", a.controllers.User.Create)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(
