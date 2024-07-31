@@ -39,15 +39,22 @@ func (s *PetService) UpdateWithForm(ctx context.Context, id int, name string, st
 	}
 
 	if err = s.DB.UpdatePet(ctx, pet); err != nil {
-		return err
+		return e.Wrap("couldn't update pet", err)
 	}
 
 	return nil
 }
 
 func (s *PetService) DeleteById(ctx context.Context, id int) error {
-	//TODO implement me
-	panic("implement me")
+	if _, err := s.GetById(ctx, id); err != nil {
+		return err
+	}
+
+	if err := s.DB.DeletePetById(ctx, id); err != nil {
+		return e.Wrap("couldn't delete pet", err)
+	}
+
+	return nil
 }
 
 func (s *PetService) UploadImage(ctx context.Context, id int) error {

@@ -59,6 +59,30 @@ info:
   version: 1.0.0
 paths:
   /pet/{petId}:
+    delete:
+      description: Delete pet provided pet id
+      parameters:
+      - description: Pet ID
+        in: path
+        name: petId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: delete pet
+      tags:
+      - pet
     get:
       description: Return pet object provided pet id
       parameters:

@@ -89,9 +89,31 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// DeleteById godoc
+// @Summary delete pet
+// @Description Delete pet provided pet id
+// @Tags pet
+// @Param petId path int true "Pet ID"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400,404 {object} rr.JSONResponse
+// @Router /pet/{petId} [delete]
 func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[len(parts)-1]
+
+	petId, err := strconv.Atoi(id)
+	if err != nil {
+		_ = c.rr.WriteJSONError(w, errors.New("invalid id supplied"))
+		return
+	}
+
+	if err = c.service.DeleteById(r.Context(), petId); err != nil {
+		_ = c.rr.WriteJSONError(w, err, 404)
+		return
+	}
+
+	resp := rr.JSONResponse{Error: false, Message: "pet deleted"}
+	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
 func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {

@@ -142,3 +142,16 @@ func (db *PostgresDBRepo) UpdatePet(ctx context.Context, pet entities.Pet) error
 
 	return nil
 }
+
+func (db *PostgresDBRepo) DeletePetById(ctx context.Context, petId int) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `DELETE FROM pets WHERE id = $1`
+
+	if _, err := db.conn.ExecContext(ctx, query, petId); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
+}
