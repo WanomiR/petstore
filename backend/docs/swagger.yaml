@@ -32,7 +32,6 @@ definitions:
     required:
     - category
     - name
-    - photoUrls
     - status
     type: object
   entities.Tag:

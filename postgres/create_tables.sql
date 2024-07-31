@@ -175,6 +175,45 @@ CREATE TABLE public.schema_migrations (
 ALTER TABLE public.schema_migrations OWNER TO "user";
 
 --
+-- Name: store; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.store (
+    id integer NOT NULL,
+    pet_id integer,
+    quantity integer,
+    ship_date timestamp without time zone,
+    status character varying(255),
+    is_complete boolean,
+    CONSTRAINT check_status CHECK (((status)::text = ANY ((ARRAY['placed'::character varying, 'approved'::character varying, 'delivered'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.store OWNER TO "user";
+
+--
+-- Name: store_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.store_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.store_id_seq OWNER TO "user";
+
+--
+-- Name: store_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.store_id_seq OWNED BY public.store.id;
+
+
+--
 -- Name: tags; Type: TABLE; Schema: public; Owner: user
 --
 
@@ -209,6 +248,46 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: users; Type: TABLE; Schema: public; Owner: user
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    username character varying(255),
+    first_name character varying(255),
+    last_name character varying(255),
+    email character varying(255),
+    password character varying(255),
+    phone character varying(255),
+    user_status integer
+);
+
+
+ALTER TABLE public.users OWNER TO "user";
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: user
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_id_seq OWNER TO "user";
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: user
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
 -- Name: categories id; Type: DEFAULT; Schema: public; Owner: user
 --
 
@@ -237,10 +316,24 @@ ALTER TABLE ONLY public.photo_urls ALTER COLUMN id SET DEFAULT nextval('public.p
 
 
 --
+-- Name: store id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.store ALTER COLUMN id SET DEFAULT nextval('public.store_id_seq'::regclass);
+
+
+--
 -- Name: tags id; Type: DEFAULT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
@@ -321,6 +414,20 @@ COPY public.schema_migrations (version, dirty) FROM stdin;
 
 
 --
+-- Data for Name: store; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.store (id, pet_id, quantity, ship_date, status, is_complete) FROM stdin;
+1	2	1	2024-07-31 12:11:14.265084	placed	f
+2	3	1	2024-07-31 12:11:14.265084	delivered	t
+3	5	1	2024-07-31 12:11:14.265084	approved	f
+4	6	1	2024-07-31 12:11:14.265084	delivered	t
+5	8	1	2024-07-31 12:11:14.265084	placed	f
+6	9	1	2024-07-31 12:11:14.265084	delivered	t
+\.
+
+
+--
 -- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: user
 --
 
@@ -332,6 +439,17 @@ COPY public.tags (id, name) FROM stdin;
 5	calm
 6	happy
 7	energetic
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: user
+--
+
+COPY public.users (id, username, first_name, last_name, email, password, phone, user_status) FROM stdin;
+1	wanomir	Ivan	Romadin	wanomir@yandex.ru	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
+2	johndoe001	John	Doe	john.doe@gmail.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
+3	dragonrider	Rhaenyra	Targaryen	r.targaryen@dragonstone.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
 \.
 
 
@@ -364,10 +482,24 @@ SELECT pg_catalog.setval('public.photo_urls_id_seq', 10, true);
 
 
 --
+-- Name: store_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.store_id_seq', 6, true);
+
+
+--
 -- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
 SELECT pg_catalog.setval('public.tags_id_seq', 7, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 3, true);
 
 
 --
@@ -411,11 +543,35 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: store store_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.store
+    ADD CONSTRAINT store_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: user
 --
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: user
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
 
 
 --

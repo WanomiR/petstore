@@ -339,7 +339,6 @@ const docTemplate = `{
             "required": [
                 "category",
                 "name",
-                "photoUrls",
                 "status"
             ],
             "properties": {
