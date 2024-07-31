@@ -16,6 +16,7 @@ type PetRepository interface {
 	CreatePet(ctx context.Context, categoryId int, petName string, petStatus string) (int, error)
 	UpdatePet(ctx context.Context, pet entities.Pet) error
 	DeletePet(ctx context.Context, petId int) error
+	GetPetsByStatus(ctx context.Context, petStatus string) ([]entities.Pet, error)
 	GetPetCategoryById(ctx context.Context, categoryId int) (entities.Category, error)
 	GetPetCategoryByName(ctx context.Context, categoryName string) (entities.Category, error)
 	CreatePetCategory(ctx context.Context, categoryName string) (entities.Category, error)

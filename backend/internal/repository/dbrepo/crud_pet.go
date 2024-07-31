@@ -73,6 +73,30 @@ func (db *PostgresDBRepo) DeletePet(ctx context.Context, petId int) error {
 	return nil
 }
 
+func (db *PostgresDBRepo) GetPetsByStatus(ctx context.Context, petStatus string) ([]entities.Pet, error) {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `SELECT id, category_id, name, status FROM pets WHERE status = $1`
+
+	rows, err := db.conn.QueryContext(ctx, query, petStatus)
+	if err != nil {
+		return nil, e.Wrap("failed to execute query", err)
+	}
+	defer rows.Close()
+
+	pets := make([]entities.Pet, 0)
+	for rows.Next() {
+		var pet entities.Pet
+		if err = rows.Scan(&pet.Id, &pet.Category.Id, &pet.Name, &pet.Status); err != nil {
+			return nil, e.Wrap("failed to scan row", err)
+		}
+		pets = append(pets, pet)
+	}
+
+	return pets, nil
+}
+
 func (db *PostgresDBRepo) GetPetCategoryById(ctx context.Context, categoryId int) (entities.Category, error) {
 	query := `SELECT id, name FROM categories WHERE id = $1`
 

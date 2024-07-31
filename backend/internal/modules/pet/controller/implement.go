@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"backend/internal/lib/e"
 	"backend/internal/lib/rr"
 	"backend/internal/modules/pet/entities"
 	"backend/internal/modules/pet/service"
@@ -209,7 +210,34 @@ func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {
 	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
+// GetByStatus godoc
+// @Summary get pets by status
+// @Description Finds pets by status
+// @Tags pet
+// @Produce json
+// @Param status query []string true "Status values that need to be considered for filter<br>Available values : <i>available, pending, sold</i>"
+// @Success 200 {object} entities.Pets
+// @Failure 400 {object} rr.JSONResponse
+// @Router /pet/findByStatus [get]
 func (c *PetControl) GetByStatus(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	statuses := strings.Split(r.URL.Query()["status"][0], ",")
+
+	if len(statuses) == 0 {
+		_ = c.rr.WriteJSONError(w, errors.New("at least one field must be filled"))
+		return
+	}
+
+	result := make(entities.Pets, 0)
+	ctx := r.Context()
+
+	for _, status := range statuses {
+		pets, err := c.service.GetByStatus(ctx, status)
+		if err != nil {
+			_ = c.rr.WriteJSONError(w, e.Wrap("couldn't get pets by status "+status, err))
+			return
+		}
+		result = append(result, pets...)
+	}
+
+	_ = c.rr.WriteJSON(w, 200, result)
 }

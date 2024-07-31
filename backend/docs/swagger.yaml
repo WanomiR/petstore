@@ -232,4 +232,33 @@ paths:
       summary: upload image
       tags:
       - pet
+  /pet/findByStatus:
+    get:
+      description: Finds pets by status
+      parameters:
+      - collectionFormat: csv
+        description: 'Status values that need to be considered for filter<br>Available
+          values : <i>available, pending, sold</i>'
+        in: query
+        items:
+          type: string
+        name: status
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Pet'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: get pets by status
+      tags:
+      - pet
 swagger: "2.0"

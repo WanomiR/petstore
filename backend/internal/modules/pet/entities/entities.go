@@ -27,6 +27,8 @@ type Pet struct {
 	Status    string   `json:"status" binding:"required" example:"available"` // available | pending | sold
 }
 
+type Pets []Pet
+
 type PetTag struct {
 	Id    int `db:"id,int"`
 	PetId int `db:"pet_id,int"`

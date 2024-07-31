@@ -93,6 +93,48 @@
                 }
             }
         },
+        "/pet/findByStatus": {
+            "get": {
+                "description": "Finds pets by status",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pet"
+                ],
+                "summary": "get pets by status",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Status values that need to be considered for filter\u003cbr\u003eAvailable values : \u003ci\u003eavailable, pending, sold\u003c/i\u003e",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.Pet"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/pet/{petId}": {
             "get": {
                 "description": "Find pet by ID",

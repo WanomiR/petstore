@@ -96,6 +96,10 @@ func (s *PetService) Create(ctx context.Context, pet entities.Pet) (int, error) 
 		return 0, errors.New("pet name or pet status or category name is empty")
 	}
 
+	if !s.statusIsValid(pet.Status) {
+		return 0, errors.New("invalid status")
+	}
+
 	// handle pet category
 	category, err := s.DB.GetPetCategoryByName(ctx, pet.Category.Name)
 	// use category id if category exists
@@ -160,6 +164,10 @@ func (s *PetService) Update(ctx context.Context, petUpdate entities.Pet) error {
 
 	if petUpdate.Status != "" {
 		pet.Status = petUpdate.Status
+	}
+
+	if !s.statusIsValid(pet.Status) {
+		return errors.New("invalid status")
 	}
 
 	if petUpdate.Category.Name != "" {
@@ -232,6 +240,27 @@ func (s *PetService) Update(ctx context.Context, petUpdate entities.Pet) error {
 }
 
 func (s *PetService) GetByStatus(ctx context.Context, status string) ([]entities.Pet, error) {
-	//TODO implement me
-	panic("implement me")
+	if !s.statusIsValid(status) {
+		return nil, errors.New("invalid status")
+	}
+
+	pets, err := s.DB.GetPetsByStatus(ctx, status)
+	if err != nil {
+		return nil, e.Wrap("couldn't get pets by status", err)
+	}
+
+	result := make([]entities.Pet, 0, len(pets))
+	for _, p := range pets {
+		var pet entities.Pet
+		if pet, err = s.GetById(ctx, p.Id); err != nil {
+			return nil, e.Wrap("couldn't get pet by id", err)
+		}
+		result = append(result, pet)
+	}
+
+	return result, nil
+}
+
+func (s *PetService) statusIsValid(status string) bool {
+	return status == "available" || status == "pending" || status == "sold"
 }
