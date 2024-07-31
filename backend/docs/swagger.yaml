@@ -67,6 +67,8 @@ paths:
         name: petId
         required: true
         type: integer
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -137,6 +139,41 @@ paths:
           schema:
             $ref: '#/definitions/rr.JSONResponse'
       summary: update pet
+      tags:
+      - pet
+  /pet/{petId}/uploadImage:
+    post:
+      description: Upload pet image
+      parameters:
+      - description: Pet ID
+        in: path
+        name: petId
+        required: true
+        type: integer
+      - description: Additional data to pass to server
+        in: formData
+        name: additionalMetadata
+        type: string
+      - description: File to upload
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: upload image
       tags:
       - pet
 swagger: "2.0"

@@ -102,6 +102,9 @@ const docTemplate = `{
             },
             "delete": {
                 "description": "Delete pet provided pet id",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "pet"
                 ],
@@ -113,6 +116,59 @@ const docTemplate = `{
                         "name": "petId",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/pet/{petId}/uploadImage": {
+            "post": {
+                "description": "Upload pet image",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pet"
+                ],
+                "summary": "upload image",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pet ID",
+                        "name": "petId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Additional data to pass to server",
+                        "name": "additionalMetadata",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData"
                     }
                 ],
                 "responses": {

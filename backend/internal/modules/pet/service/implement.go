@@ -57,11 +57,6 @@ func (s *PetService) DeleteById(ctx context.Context, id int) error {
 	return nil
 }
 
-func (s *PetService) UploadImage(ctx context.Context, id int) error {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (s *PetService) Create(ctx context.Context, pet entities.Pet) (int, error) {
 	//TODO implement me
 	panic("implement me")
