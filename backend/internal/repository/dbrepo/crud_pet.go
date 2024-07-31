@@ -125,8 +125,8 @@ func (db *PostgresDBRepo) CreatePetCategory(ctx context.Context, categoryName st
 	return category, nil
 }
 
-func (db *PostgresDBRepo) GetPhotoUrlsByPetId(ctx context.Context, petId int) ([]string, error) {
-	query := `SELECT url FROM photo_urls WHERE pet_id = $1`
+func (db *PostgresDBRepo) GetPhotoUrlsByPetId(ctx context.Context, petId int) ([]entities.PhotoUrl, error) {
+	query := `SELECT id, pet_id, url FROM photo_urls WHERE pet_id = $1`
 
 	rows, err := db.conn.QueryContext(ctx, query, petId)
 	if err != nil {
@@ -134,16 +134,16 @@ func (db *PostgresDBRepo) GetPhotoUrlsByPetId(ctx context.Context, petId int) ([
 	}
 	defer rows.Close()
 
-	urls := make([]string, 0)
+	photoUrls := make([]entities.PhotoUrl, 0)
 	for rows.Next() {
-		var url string
-		if err = rows.Scan(&url); err != nil {
+		var photoUrl entities.PhotoUrl
+		if err = rows.Scan(&photoUrl.Id, &photoUrl.PetId, &photoUrl.Url); err != nil {
 			return nil, e.Wrap("failed to scan row", err)
 		}
-		urls = append(urls, url)
+		photoUrls = append(photoUrls, photoUrl)
 	}
 
-	return urls, nil
+	return photoUrls, nil
 }
 
 func (db *PostgresDBRepo) CreatePetPhotoUrl(ctx context.Context, petId int, photoUrl string) error {
@@ -153,6 +153,19 @@ func (db *PostgresDBRepo) CreatePetPhotoUrl(ctx context.Context, petId int, phot
 	query := `INSERT INTO photo_urls(pet_id, url) VALUES ($1, $2)`
 
 	if _, err := db.conn.ExecContext(ctx, query, petId, photoUrl); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
+}
+
+func (db *PostgresDBRepo) DeletePhotoUrlsByPetId(ctx context.Context, petId int) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `DELETE FROM photo_urls WHERE pet_id = $1`
+
+	if _, err := db.conn.ExecContext(ctx, query, petId); err != nil {
 		return e.Wrap("failed to execute query", err)
 	}
 
@@ -247,6 +260,19 @@ func (db *PostgresDBRepo) GetPetTagPairsByPetId(ctx context.Context, petId int) 
 	}
 
 	return petTagPairs, nil
+}
+
+func (db *PostgresDBRepo) DeletePetTagsByPetId(ctx context.Context, petId int) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `DELETE FROM pet_tags WHERE pet_id = $1`
+
+	if _, err := db.conn.ExecContext(ctx, query, petId); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
 }
 
 func (db *PostgresDBRepo) CreatePetTagPair(ctx context.Context, petId int, tagId int) (entities.PetTag, error) {
