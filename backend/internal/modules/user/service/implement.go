@@ -4,6 +4,7 @@ import (
 	"backend/internal/modules/user/entities"
 	"backend/internal/repository"
 	"context"
+	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -61,11 +62,29 @@ func (s *UserService) UpdateUser(ctx context.Context, userUpdate entities.User) 
 }
 
 func (s *UserService) CreateUser(ctx context.Context, user entities.User) error {
-	//TODO implement me
-	panic("implement me")
+	if user.Username == "" || user.Password == "" {
+		return errors.New("username and password are mandatory")
+	}
+
+	if _, err := s.DB.GetUserByUsername(ctx, user.Username); err == nil {
+		return errors.New("user already exists")
+	}
+
+	// TODO: introduce authentication module
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	user.Password = string(password)
+
+	if err := s.DB.CreateUser(ctx, user); err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func (s *UserService) DeleteUser(ctx context.Context, username string) error {
-	//TODO implement me
-	panic("implement me")
+	if err := s.DB.DeleteUser(ctx, username); err != nil {
+		return err
+	}
+	return nil
 }

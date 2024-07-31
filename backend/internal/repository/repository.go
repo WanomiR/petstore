@@ -16,6 +16,8 @@ type Repository interface {
 type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (ue.User, error)
 	UpdateUser(ctx context.Context, user ue.User) error
+	CreateUser(ctx context.Context, user ue.User) error
+	DeleteUser(ctx context.Context, username string) error
 }
 
 type PetRepository interface {

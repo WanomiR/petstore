@@ -48,3 +48,31 @@ func (db *PostgresDBRepo) UpdateUser(ctx context.Context, user entities.User) er
 
 	return nil
 }
+
+func (db *PostgresDBRepo) CreateUser(ctx context.Context, user entities.User) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `INSERT INTO users (username, first_name, last_name, email, password, phone, user_status) 
+			  	 VALUES ($1, $2, $3, $4, $5, $6, $7)`
+
+	if _, err := db.conn.ExecContext(ctx, query, user.Username, user.FirstName, user.LastName,
+		user.Email, user.Password, user.Phone, user.UserStatus); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
+}
+
+func (db *PostgresDBRepo) DeleteUser(ctx context.Context, username string) error {
+	ctx, cancel := context.WithTimeout(ctx, db.timeout)
+	defer cancel()
+
+	query := `DELETE FROM users WHERE username = $1`
+
+	if _, err := db.conn.ExecContext(ctx, query, username); err != nil {
+		return e.Wrap("failed to execute query", err)
+	}
+
+	return nil
+}
