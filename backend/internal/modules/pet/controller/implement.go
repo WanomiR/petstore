@@ -2,8 +2,10 @@ package controller
 
 import (
 	"backend/internal/lib/rr"
+	"backend/internal/modules/pet/entities"
 	"backend/internal/modules/pet/service"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -154,9 +156,29 @@ func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
 	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
+// CreatePet godoc
+// @Summary create pet
+// @Description Create pet
+// @Tags pet
+// @Accept json
+// @Produce json
+// @Param body body entities.Pet true "Pet object that needs to be added to the store"
+// @Success 200 {object} rr.JSONResponse
+// @Failure 400 {object} rr.JSONResponse
+// @Router /pet [post]
 func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	var pet entities.Pet
+	_ = c.rr.ReadJSON(w, r, &pet)
+
+	petId, err := c.service.Create(r.Context(), pet)
+	if err != nil {
+		_ = c.rr.WriteJSONError(w, err)
+		return
+	}
+
+	resp := rr.JSONResponse{Error: false, Message: fmt.Sprintf("pet created, id: %d", petId)}
+	_ = c.rr.WriteJSON(w, 200, resp)
+
 }
 
 func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {

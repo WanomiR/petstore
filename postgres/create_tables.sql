@@ -98,6 +98,7 @@ CREATE TABLE public.pets (
     category_id integer,
     name character varying(255),
     status character varying(255),
+    is_deleted boolean,
     CONSTRAINT check_status CHECK (((status)::text = ANY ((ARRAY['available'::character varying, 'pending'::character varying, 'sold'::character varying])::text[])))
 );
 
@@ -279,16 +280,16 @@ COPY public.pet_tags (id, pet_id, tag_id) FROM stdin;
 -- Data for Name: pets; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.pets (id, category_id, name, status) FROM stdin;
-1	1	Poppy	available
-2	1	Bella	pending
-3	1	Tilly	sold
-4	2	Abby	available
-5	2	Bailey	pending
-6	2	Rex	sold
-7	3	Basil	available
-8	3	Danger Mouse	pending
-9	3	Jerry	sold
+COPY public.pets (id, category_id, name, status, is_deleted) FROM stdin;
+1	1	Poppy	available	f
+2	1	Bella	pending	f
+3	1	Tilly	sold	f
+4	2	Abby	available	f
+5	2	Bailey	pending	f
+6	2	Rex	sold	f
+7	3	Basil	available	f
+8	3	Danger Mouse	pending	f
+9	3	Jerry	sold	f
 \.
 
 

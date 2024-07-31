@@ -15,6 +15,46 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/pet": {
+            "post": {
+                "description": "Create pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "pet"
+                ],
+                "summary": "create pet",
+                "parameters": [
+                    {
+                        "description": "Pet object that needs to be added to the store",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Pet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/pet/{petId}": {
             "get": {
                 "description": "Return pet object provided pet id",
@@ -168,7 +208,8 @@ const docTemplate = `{
                         "type": "file",
                         "description": "File to upload",
                         "name": "file",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -235,7 +276,7 @@ const docTemplate = `{
                 "status": {
                     "description": "available | pending | sold",
                     "type": "string",
-                    "example": "active"
+                    "example": "available"
                 },
                 "tags": {
                     "type": "array",

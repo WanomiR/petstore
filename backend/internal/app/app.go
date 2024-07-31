@@ -153,7 +153,8 @@ func (a *App) routes() *chi.Mux {
 		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
 		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
 		r.Post("/{petId}/uploadImage", a.controllers.Pet.UploadImage)
-		r.Post("/", a.controllers.Pet.UpdatePet)
+		r.Post("/", a.controllers.Pet.CreatePet)
+		r.Put("/", a.controllers.Pet.UpdatePet)
 		r.Get("/findByStatus", a.controllers.Pet.GetByStatus)
 	})
 

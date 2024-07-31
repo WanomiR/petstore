@@ -34,23 +34,24 @@ CREATE TABLE IF NOT EXISTS pets
     id          SERIAL PRIMARY KEY,
     category_id INTEGER,
     name        VARCHAR(255),
-    status      VARCHAR(255)
+    status      VARCHAR(255),
+    is_deleted  BOOLEAN
 );
 
 ALTER TABLE pets
     ADD CONSTRAINT check_status
         CHECK ( status IN ('available', 'pending', 'sold') );
 
-INSERT INTO pets (category_id, name, status)
-VALUES (1, 'Poppy', 'available'),
-       (1, 'Bella', 'pending'),
-       (1, 'Tilly', 'sold'),
-       (2, 'Abby', 'available'),
-       (2, 'Bailey', 'pending'),
-       (2, 'Rex', 'sold'),
-       (3, 'Basil', 'available'),
-       (3, 'Danger Mouse', 'pending'),
-       (3, 'Jerry', 'sold')
+INSERT INTO pets (category_id, name, status, is_deleted)
+VALUES (1, 'Poppy', 'available', FALSE),
+       (1, 'Bella', 'pending', FALSE),
+       (1, 'Tilly', 'sold', FALSE),
+       (2, 'Abby', 'available', FALSE),
+       (2, 'Bailey', 'pending', FALSE),
+       (2, 'Rex', 'sold', FALSE),
+       (3, 'Basil', 'available', FALSE),
+       (3, 'Danger Mouse', 'pending', FALSE),
+       (3, 'Jerry', 'sold', FALSE)
 ;
 
 -- photo urls

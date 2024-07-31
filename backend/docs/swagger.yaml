@@ -23,7 +23,7 @@ definitions:
         type: array
       status:
         description: available | pending | sold
-        example: active
+        example: available
         type: string
       tags:
         items:
@@ -58,6 +58,32 @@ info:
   title: Petstore
   version: 1.0.0
 paths:
+  /pet:
+    post:
+      consumes:
+      - application/json
+      description: Create pet
+      parameters:
+      - description: Pet object that needs to be added to the store
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Pet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: create pet
+      tags:
+      - pet
   /pet/{petId}:
     delete:
       description: Delete pet provided pet id
@@ -157,6 +183,7 @@ paths:
       - description: File to upload
         in: formData
         name: file
+        required: true
         type: file
       produces:
       - application/json

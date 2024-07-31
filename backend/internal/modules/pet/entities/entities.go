@@ -24,7 +24,13 @@ type Pet struct {
 	Name      string   `json:"name" binding:"required" example:"doggy"`
 	PhotoUrls []string `json:"photoUrls" binding:"required"`
 	Tags      []Tag    `json:"tags"`
-	Status    string   `json:"status" binding:"required" example:"active"` // available | pending | sold
+	Status    string   `json:"status" binding:"required" example:"available"` // available | pending | sold
+}
+
+type PetTag struct {
+	Id    int `db:"id,int"`
+	PetId int `db:"pet_id,int"`
+	TagId int `db:"tag_id,int"`
 }
 
 type Order struct {
