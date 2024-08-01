@@ -2,6 +2,7 @@ package controller
 
 import (
 	"backend/internal/lib/rr"
+	"backend/internal/modules/store/entities"
 	"backend/internal/modules/store/service"
 	"net/http"
 )
@@ -15,9 +16,21 @@ func NewStoreControl(service service.StoreServicer, readResponder rr.ReadRespond
 	return &StoreControl{service: service, rr: readResponder}
 }
 
+// GetInventory godoc
+// @Summary get inventory
+// @Security ApiKeyAuth
+// @Description Returns pet inventories
+// @Tags store
+// @Produce json
+// @Success 200 {object} entities.Inventory
+// @Router /store/inventory [get]
 func (s *StoreControl) GetInventory(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	payload := entities.Inventory{
+		"additionalProp1": 0,
+		"additionalProp2": 0,
+		"additionalProp3": 0,
+	}
+	_ = s.rr.WriteJSON(w, 200, payload)
 }
 
 func (s *StoreControl) CreateOrder(w http.ResponseWriter, r *http.Request) {

@@ -355,6 +355,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/store/inventory": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns pet inventories",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "store"
+                ],
+                "summary": "get inventory",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.Inventory"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "post": {
                 "description": "Create user",
@@ -643,6 +668,12 @@ const docTemplate = `{
                     "type": "string",
                     "example": "cat"
                 }
+            }
+        },
+        "entities.Inventory": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "integer"
             }
         },
         "entities.Pet": {

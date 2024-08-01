@@ -2,6 +2,7 @@ package repository
 
 import (
 	pe "backend/internal/modules/pet/entities"
+	se "backend/internal/modules/store/entities"
 	ue "backend/internal/modules/user/entities"
 	"context"
 	"database/sql"
@@ -11,6 +12,7 @@ type Repository interface {
 	Connection() *sql.DB
 	UserRepository
 	PetRepository
+	StoreRepository
 }
 
 type UserRepository interface {
@@ -18,6 +20,12 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user ue.User) error
 	CreateUser(ctx context.Context, user ue.User) error
 	DeleteUser(ctx context.Context, username string) error
+}
+
+type StoreRepository interface {
+	GetOrderById(ctx context.Context, orderId int) (se.Order, error)
+	CreateOrder(ctx context.Context, order se.Order) (int, error)
+	DeleteOrder(ctx context.Context, orderId int) error
 }
 
 type PetRepository interface {

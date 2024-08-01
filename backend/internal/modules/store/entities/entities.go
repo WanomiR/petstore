@@ -10,3 +10,5 @@ type Order struct {
 	Status     string    `json:"status"` // placed | approved | delivered
 	IsComplete bool      `json:"complete"`
 }
+
+type Inventory map[string]int

@@ -8,6 +8,10 @@ definitions:
         example: cat
         type: string
     type: object
+  entities.Inventory:
+    additionalProperties:
+      type: integer
+    type: object
   entities.Pet:
     properties:
       category:
@@ -303,6 +307,21 @@ paths:
       summary: get pets by status
       tags:
       - pet
+  /store/inventory:
+    get:
+      description: Returns pet inventories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Inventory'
+      security:
+      - ApiKeyAuth: []
+      summary: get inventory
+      tags:
+      - store
   /user:
     post:
       consumes:
