@@ -26,6 +26,7 @@ func NewPetControl(service service.PetServicer, readResponder rr.ReadResponder) 
 
 // GetById godoc
 // @Summary get pet by id
+// @Security ApiKeyAuth
 // @Description Find pet by ID
 // @Tags pet
 // @Produce json
@@ -54,6 +55,7 @@ func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
 
 // UpdateWithForm godoc
 // @Summary update pet
+// @Security ApiKeyAuth
 // @Description Updates a pet in the store with form data
 // @Tags pet
 // @Produce json
@@ -94,6 +96,7 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 
 // DeleteById godoc
 // @Summary delete pet
+// @Security ApiKeyAuth
 // @Description Deletes a pet
 // @Tags pet
 // @Produce json
@@ -122,6 +125,7 @@ func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
 
 // UploadImage godoc
 // @Summary upload image
+// @Security ApiKeyAuth
 // @Description Uploads an image
 // @Tags pet
 // @Produce json
@@ -159,6 +163,7 @@ func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
 
 // CreatePet godoc
 // @Summary create pet
+// @Security ApiKeyAuth
 // @Description Add a new pet to the store
 // @Tags pet
 // @Accept json
@@ -184,6 +189,7 @@ func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
 
 // UpdatePet godoc
 // @Summary update pet
+// @Security ApiKeyAuth
 // @Description Update an existing pet
 // @Tags pet
 // @Accept json
@@ -212,6 +218,7 @@ func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {
 
 // GetByStatus godoc
 // @Summary get pets by status
+// @Security ApiKeyAuth
 // @Description Finds pets by status
 // @Tags pet
 // @Produce json

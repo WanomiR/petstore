@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/pet": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update an existing pet",
                 "consumes": [
                     "application/json"
@@ -61,6 +66,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Add a new pet to the store",
                 "consumes": [
                     "application/json"
@@ -101,6 +111,11 @@ const docTemplate = `{
         },
         "/pet/findByStatus": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Finds pets by status",
                 "produces": [
                     "application/json"
@@ -143,6 +158,11 @@ const docTemplate = `{
         },
         "/pet/{petId}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Find pet by ID",
                 "produces": [
                     "application/json"
@@ -182,6 +202,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Updates a pet in the store with form data",
                 "produces": [
                     "application/json"
@@ -227,6 +252,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Deletes a pet",
                 "produces": [
                     "application/json"
@@ -268,6 +298,11 @@ const docTemplate = `{
         },
         "/pet/{petId}/uploadImage": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Uploads an image",
                 "produces": [
                     "application/json"
@@ -396,6 +431,68 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "get": {
+                "description": "Log user into the system",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The username for login",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "The password for login in clear text",
+                        "name": "password",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "description": "Logs out currently logged user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/rr.JSONResponse"
                         }
@@ -599,6 +696,10 @@ const docTemplate = `{
         },
         "entities.User": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -644,6 +745,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

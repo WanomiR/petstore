@@ -72,6 +72,10 @@ func (a *App) Signal() <-chan os.Signal {
 	return a.signalChan
 }
 
+func (a *App) CloseDBConn() error {
+	return a.DB.Connection().Close()
+}
+
 func (a *App) readConfig(envPath ...string) (err error) {
 	if len(envPath) > 0 {
 		err = godotenv.Load(envPath[0])
@@ -150,7 +154,7 @@ func (a *App) routes() *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	r.Route("/pet", func(r chi.Router) {
-		//r.Use(a.requireAuthentication)
+		r.Use(a.requireAuthentication)
 		r.Get("/{petId}", a.controllers.Pet.GetById)
 		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
 		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
@@ -161,17 +165,13 @@ func (a *App) routes() *chi.Mux {
 	})
 
 	r.Route("/user", func(r chi.Router) {
-		r.Group(func(r chi.Router) {
-			//r.Use(a.requireAuthentication)
-			r.Get("/{username}", a.controllers.User.GetByUsername)
-			r.Put("/{username}", a.controllers.User.Update)
-			r.Get("/logout", a.controllers.User.Logout)
-			r.Delete("/{username}", a.controllers.User.Delete)
-		})
-
-		r.Get("/login", a.controllers.User.Login)
+		r.Get("/{username}", a.controllers.User.GetByUsername)
+		r.Put("/{username}", a.controllers.User.Update)
+		r.Delete("/{username}", a.controllers.User.Delete)
 		r.Post("/", a.controllers.User.Create)
 		r.Post("/createWithArray", a.controllers.User.CreateWithArray)
+		r.Get("/login", a.controllers.User.Login)
+		r.Get("/logout", a.controllers.User.Logout)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(

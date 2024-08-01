@@ -1,7 +1,7 @@
 package service
 
 import (
-	ae "backend/internal/modules/auth/entities"
+	"backend/internal/lib/e"
 	"backend/internal/modules/auth/service"
 	"backend/internal/modules/user/entities"
 	"backend/internal/repository"
@@ -15,8 +15,8 @@ type UserService struct {
 	auth service.AuthServicer
 }
 
-func NewUserService(db repository.Repository) *UserService {
-	return &UserService{DB: db}
+func NewUserService(db repository.Repository, auth service.AuthServicer) *UserService {
+	return &UserService{DB: db, auth: auth}
 }
 
 func (s *UserService) GetByName(ctx context.Context, name string) (entities.User, error) {
@@ -87,10 +87,27 @@ func (s *UserService) Delete(ctx context.Context, username string) error {
 	return nil
 }
 
-func (s *UserService) Authorize(ctx context.Context, username, password string) (tokens ae.TokensPair, cookie *http.Cookie, err error) {
-	panic("implement me")
+func (s *UserService) Authorize(ctx context.Context, username, password string) (string, *http.Cookie, error) {
+	user, err := s.GetByName(ctx, username)
+	if err != nil {
+		return "", nil, e.Wrap("user not found", err)
+	}
+
+	ok, err := s.auth.VerifyPassword(password, user.Password)
+	if err != nil || !ok {
+		return "", nil, errors.New("invalid credentials")
+	}
+
+	token, err := s.auth.GenerateToken(username)
+	if err != nil {
+		return "", nil, e.Wrap("failed to generate tokens", err)
+	}
+
+	refreshCookie := s.auth.CreateCookie(token)
+
+	return token, refreshCookie, nil
 }
 
-func (s *UserService) Reset(ctx context.Context) *http.Cookie {
-	panic("implement me")
+func (s *UserService) ResetCookie() *http.Cookie {
+	return s.auth.CreateExpiredCookie()
 }

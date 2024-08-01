@@ -7,8 +7,9 @@ import (
 
 type AuthServicer interface {
 	EncryptPassword(password string) (string, error)
-	GenerateTokensPair(subject string) (entities.TokensPair, error)
-	GetRefreshCookie(refreshToken string) *http.Cookie
-	GetExpiredRefreshCookie() *http.Cookie
-	GetTokenFromHeaderAndVerify(w http.ResponseWriter, r *http.Request) (string, *entities.Claims, error)
+	VerifyPassword(password string, encryptedPassword string) (ok bool, err error)
+	GenerateToken(subject string) (string, error)
+	CreateCookie(refreshToken string) *http.Cookie
+	CreateExpiredCookie() *http.Cookie
+	VerifyRequest(w http.ResponseWriter, r *http.Request) (string, *entities.Claims, error)
 }

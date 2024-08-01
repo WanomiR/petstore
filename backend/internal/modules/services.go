@@ -14,9 +14,11 @@ type Services struct {
 }
 
 func NewServices(db repository.Repository, issuer, audience, secret, cookieDomain string) *Services {
+	authService := au.NewAuthService(issuer, audience, secret, cookieDomain)
+
 	return &Services{
 		Pet:  ps.NewPetService(db),
-		User: us.NewUserService(db),
-		Auth: au.NewAuthService(issuer, audience, secret, cookieDomain),
+		User: us.NewUserService(db, authService),
+		Auth: authService,
 	}
 }

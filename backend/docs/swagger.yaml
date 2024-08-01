@@ -67,6 +67,9 @@ definitions:
       username:
         example: johndoe001
         type: string
+    required:
+    - password
+    - username
     type: object
   rr.JSONResponse:
     properties:
@@ -106,6 +109,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: create pet
       tags:
       - pet
@@ -135,6 +140,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: update pet
       tags:
       - pet
@@ -162,6 +169,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: delete pet
       tags:
       - pet
@@ -188,6 +197,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: get pet by id
       tags:
       - pet
@@ -218,6 +229,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: update pet
       tags:
       - pet
@@ -254,6 +267,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: upload image
       tags:
       - pet
@@ -283,6 +298,8 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/rr.JSONResponse'
+      security:
+      - ApiKeyAuth: []
       summary: get pets by status
       tags:
       - pet
@@ -427,4 +444,50 @@ paths:
       summary: create with array
       tags:
       - user
+  /user/login:
+    get:
+      description: Log user into the system
+      parameters:
+      - description: The username for login
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: The password for login in clear text
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: login
+      tags:
+      - user
+  /user/logout:
+    get:
+      description: Logs out currently logged user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: logout
+      tags:
+      - user
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

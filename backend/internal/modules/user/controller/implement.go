@@ -203,9 +203,18 @@ func (c *UserControl) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Logout godoc
+// @Summary logout
+// @Description Logs out currently logged user
+// @Tags user
+// @Produce json
+// @Success 200 {object} rr.JSONResponse
+// @Router /user/logout [get]
 func (c *UserControl) Logout(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	http.SetCookie(w, c.service.ResetCookie())
+
+	resp := rr.JSONResponse{Error: false, Message: "user logged out"}
+	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
 func usernameFromPath(path string) string {
