@@ -1,13 +1,17 @@
 package service
 
 import (
-	"backend/internal/modules/user/entities"
+	ae "backend/internal/modules/auth/entities"
+	ue "backend/internal/modules/user/entities"
 	"context"
+	"net/http"
 )
 
 type UserServicer interface {
-	GetUserByName(ctx context.Context, name string) (entities.User, error)
-	UpdateUser(ctx context.Context, user entities.User) error
-	CreateUser(ctx context.Context, user entities.User) error
-	DeleteUser(ctx context.Context, username string) error
+	GetByName(ctx context.Context, name string) (ue.User, error)
+	Update(ctx context.Context, user ue.User) error
+	Create(ctx context.Context, user ue.User) error
+	Delete(ctx context.Context, username string) error
+	Authorize(ctx context.Context, username, password string) (tokens ae.TokensPair, cookie *http.Cookie, err error)
+	Reset(ctx context.Context) *http.Cookie
 }

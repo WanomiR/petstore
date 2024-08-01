@@ -399,4 +399,32 @@ paths:
       summary: update user
       tags:
       - user
+  /user/createWithArray:
+    post:
+      consumes:
+      - application/json
+      description: Create list of users with given input array
+      parameters:
+      - description: List of user objects
+        in: body
+        name: body
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/entities.User'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: create with array
+      tags:
+      - user
 swagger: "2.0"

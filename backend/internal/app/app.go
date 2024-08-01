@@ -38,6 +38,7 @@ type Server interface {
 type App struct {
 	Host        string
 	Port        string
+	JWTSecret   string
 	server      *http.Server
 	signalChan  chan os.Signal
 	DSN         string
@@ -84,6 +85,8 @@ func (a *App) readConfig(envPath ...string) (err error) {
 
 	a.Host = os.Getenv("HOST")
 	a.Port = os.Getenv("PORT")
+	a.JWTSecret = os.Getenv("JWT_SECRET")
+
 	a.DSN = fmt.Sprintf( // database source name
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5\n",
 		os.Getenv("POSTGRES_HOST"),
@@ -107,7 +110,7 @@ func (a *App) init() error {
 	}
 	a.DB = dbrepo.NewPostgresDBRepo(conn)
 
-	a.services = modules.NewServices(a.DB)
+	a.services = modules.NewServices(a.DB, a.Host, a.Host, a.JWTSecret, a.Host)
 	a.controllers = modules.NewControllers(
 		a.services,
 		rr.NewReadRespond(rr.WithMaxBytes(1<<10)),
@@ -147,7 +150,7 @@ func (a *App) routes() *chi.Mux {
 	r.Use(middleware.Recoverer)
 
 	r.Route("/pet", func(r chi.Router) {
-		// TODO: apply authorization here
+		//r.Use(a.requireAuthentication)
 		r.Get("/{petId}", a.controllers.Pet.GetById)
 		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
 		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
@@ -159,7 +162,7 @@ func (a *App) routes() *chi.Mux {
 
 	r.Route("/user", func(r chi.Router) {
 		r.Group(func(r chi.Router) {
-			// TODO: apply authorization here
+			//r.Use(a.requireAuthentication)
 			r.Get("/{username}", a.controllers.User.GetByUsername)
 			r.Put("/{username}", a.controllers.User.Update)
 			r.Get("/logout", a.controllers.User.Logout)
@@ -169,7 +172,6 @@ func (a *App) routes() *chi.Mux {
 		r.Get("/login", a.controllers.User.Login)
 		r.Post("/", a.controllers.User.Create)
 		r.Post("/createWithArray", a.controllers.User.CreateWithArray)
-		//r.Post("/createWithList", nil)
 	})
 
 	r.Get("/swagger/*", httpSwagger.Handler(

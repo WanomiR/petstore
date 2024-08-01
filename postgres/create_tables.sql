@@ -185,6 +185,7 @@ CREATE TABLE public.store (
     ship_date timestamp without time zone,
     status character varying(255),
     is_complete boolean,
+    is_deleted boolean,
     CONSTRAINT check_status CHECK (((status)::text = ANY ((ARRAY['placed'::character varying, 'approved'::character varying, 'delivered'::character varying])::text[])))
 );
 
@@ -259,7 +260,8 @@ CREATE TABLE public.users (
     email character varying(255),
     password character varying(255),
     phone character varying(255),
-    user_status integer
+    user_status integer,
+    is_deleted boolean
 );
 
 
@@ -417,13 +419,13 @@ COPY public.schema_migrations (version, dirty) FROM stdin;
 -- Data for Name: store; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.store (id, pet_id, quantity, ship_date, status, is_complete) FROM stdin;
-1	2	1	2024-07-31 12:11:14.265084	placed	f
-2	3	1	2024-07-31 12:11:14.265084	delivered	t
-3	5	1	2024-07-31 12:11:14.265084	approved	f
-4	6	1	2024-07-31 12:11:14.265084	delivered	t
-5	8	1	2024-07-31 12:11:14.265084	placed	f
-6	9	1	2024-07-31 12:11:14.265084	delivered	t
+COPY public.store (id, pet_id, quantity, ship_date, status, is_complete, is_deleted) FROM stdin;
+1	2	1	2024-08-01 01:22:43.294197	placed	f	f
+2	3	1	2024-08-01 01:22:43.294197	delivered	t	f
+3	5	1	2024-08-01 01:22:43.294197	approved	f	f
+4	6	1	2024-08-01 01:22:43.294197	delivered	t	f
+5	8	1	2024-08-01 01:22:43.294197	placed	f	f
+6	9	1	2024-08-01 01:22:43.294197	delivered	t	f
 \.
 
 
@@ -446,10 +448,11 @@ COPY public.tags (id, name) FROM stdin;
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: user
 --
 
-COPY public.users (id, username, first_name, last_name, email, password, phone, user_status) FROM stdin;
-1	wanomir	Ivan	Romadin	wanomir@yandex.ru	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
-2	johndoe001	John	Doe	john.doe@gmail.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
-3	dragonrider	Rhaenyra	Targaryen	r.targaryen@dragonstone.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0
+COPY public.users (id, username, first_name, last_name, email, password, phone, user_status, is_deleted) FROM stdin;
+1	wanomir	Ivan	Romadin	wanomir@yandex.ru	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0	f
+2	johndoe001	John	Doe	john.doe@gmail.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0	f
+3	jenstar	Jennifer	Lawrence	jen.lawrence@gmail.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0	f
+4	dragonrider	Rhaenyra	Targaryen	r.targaryen@dragonstone.com	$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu	7-999-999-99-99	0	f
 \.
 
 
@@ -499,7 +502,7 @@ SELECT pg_catalog.setval('public.tags_id_seq', 7, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: user
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 3, true);
+SELECT pg_catalog.setval('public.users_id_seq', 4, true);
 
 
 --

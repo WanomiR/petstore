@@ -12,7 +12,9 @@ func (db *PostgresDBRepo) GetUserByUsername(ctx context.Context, username string
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
-	query := `SELECT id, username, first_name, last_name, email, password, phone, user_status FROM users WHERE username = $1`
+	query := `SELECT id, username, first_name, last_name, email, password, phone, user_status 
+			    FROM users 
+				 WHERE username = $1 AND is_deleted = FALSE`
 
 	var user entities.User
 	err := db.conn.QueryRowContext(ctx, query, username).Scan(
@@ -53,8 +55,8 @@ func (db *PostgresDBRepo) CreateUser(ctx context.Context, user entities.User) er
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
-	query := `INSERT INTO users (username, first_name, last_name, email, password, phone, user_status) 
-			  	 VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	query := `INSERT INTO users (username, first_name, last_name, email, password, phone, user_status, is_deleted) 
+			  	 VALUES ($1, $2, $3, $4, $5, $6, $7, FALSE)`
 
 	if _, err := db.conn.ExecContext(ctx, query, user.Username, user.FirstName, user.LastName,
 		user.Email, user.Password, user.Phone, user.UserStatus); err != nil {
@@ -68,7 +70,7 @@ func (db *PostgresDBRepo) DeleteUser(ctx context.Context, username string) error
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
-	query := `DELETE FROM users WHERE username = $1`
+	query := `UPDATE users SET is_deleted = TRUE WHERE username = $1`
 
 	if _, err := db.conn.ExecContext(ctx, query, username); err != nil {
 		return e.Wrap("failed to execute query", err)

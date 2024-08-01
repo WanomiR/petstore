@@ -110,16 +110,19 @@ CREATE TABLE IF NOT EXISTS users
     email       VARCHAR(255),
     password    VARCHAR(255),
     phone       VARCHAR(255),
-    user_status INTEGER
+    user_status INTEGER,
+    is_deleted  BOOLEAN
 );
 
-INSERT INTO users (username, first_name, last_name, email, password, phone, user_status)
+INSERT INTO users (username, first_name, last_name, email, password, phone, user_status, is_deleted)
 VALUES ('wanomir', 'Ivan', 'Romadin', 'wanomir@yandex.ru',
-        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0),
+        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0, FALSE),
        ('johndoe001', 'John', 'Doe', 'john.doe@gmail.com',
-        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0),
+        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0, FALSE),
+       ('jenstar', 'Jennifer', 'Lawrence', 'jen.lawrence@gmail.com',
+        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0, FALSE),
        ('dragonrider', 'Rhaenyra', 'Targaryen', 'r.targaryen@dragonstone.com',
-        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0)
+        '$2a$10$TzogjOIjVZ9fY8/J.1EgOOlV9E1IOSGTC5WWYoP.tDewfMkYUAUXu', '7-999-999-99-99', 0, FALSE)
 ;
 
 -- store
@@ -130,18 +133,19 @@ CREATE TABLE IF NOT EXISTS store
     quantity    INTEGER,
     ship_date   TIMESTAMP,
     status      VARCHAR(255),
-    is_complete BOOLEAN
+    is_complete BOOLEAN,
+    is_deleted  BOOLEAN
 );
 
 ALTER TABLE store
     ADD CONSTRAINT check_status
         CHECK ( status IN ('placed', 'approved', 'delivered') );
 
-INSERT INTO store (pet_id, quantity, ship_date, status, is_complete)
-VALUES (2, 1, now(), 'placed', FALSE),
-       (3, 1, now(), 'delivered', TRUE),
-       (5, 1, now(), 'approved', FALSE),
-       (6, 1, now(), 'delivered', TRUE),
-       (8, 1, now(), 'placed', FALSE),
-       (9, 1, now(), 'delivered', TRUE)
+INSERT INTO store (pet_id, quantity, ship_date, status, is_complete, is_deleted)
+VALUES (2, 1, now(), 'placed', FALSE, FALSE),
+       (3, 1, now(), 'delivered', TRUE, FALSE),
+       (5, 1, now(), 'approved', FALSE, FALSE),
+       (6, 1, now(), 'delivered', TRUE, FALSE),
+       (8, 1, now(), 'placed', FALSE, FALSE),
+       (9, 1, now(), 'delivered', TRUE, FALSE)
 ;
