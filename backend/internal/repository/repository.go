@@ -14,20 +14,6 @@ type Repository interface {
 	PetRepository
 	StoreRepository
 }
-
-type UserRepository interface {
-	GetUserByUsername(ctx context.Context, username string) (ue.User, error)
-	UpdateUser(ctx context.Context, user ue.User) error
-	CreateUser(ctx context.Context, user ue.User) error
-	DeleteUser(ctx context.Context, username string) error
-}
-
-type StoreRepository interface {
-	GetOrderById(ctx context.Context, orderId int) (se.Order, error)
-	CreateOrder(ctx context.Context, order se.Order) (int, error)
-	DeleteOrder(ctx context.Context, orderId int) error
-}
-
 type PetRepository interface {
 	GetPetById(ctx context.Context, petId int) (pe.Pet, error)
 	CreatePet(ctx context.Context, categoryId int, petName string, petStatus string) (int, error)
@@ -47,4 +33,17 @@ type PetRepository interface {
 	GetPetTagPairsByPetId(ctx context.Context, petId int) ([]pe.PetTag, error)
 	DeletePetTagsByPetId(ctx context.Context, petId int) error
 	CreatePetTagPair(ctx context.Context, petId int, tagId int) (pe.PetTag, error)
+}
+
+type StoreRepository interface {
+	GetOrderById(ctx context.Context, orderId int) (se.Order, error)
+	CreateOrder(ctx context.Context, order se.Order) (int, error)
+	DeleteOrder(ctx context.Context, orderId int) error
+}
+
+type UserRepository interface {
+	GetUserByUsername(ctx context.Context, username string) (ue.User, error)
+	UpdateUser(ctx context.Context, user ue.User) error
+	CreateUser(ctx context.Context, user ue.User) error
+	DeleteUser(ctx context.Context, username string) error
 }
