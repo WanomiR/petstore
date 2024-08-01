@@ -1,7 +1,5 @@
 package entities
 
-import "time"
-
 type Category struct {
 	Id   int    `json:"id,int"`
 	Name string `json:"name" example:"cat"`
@@ -33,13 +31,4 @@ type PetTag struct {
 	Id    int `db:"id,int"`
 	PetId int `db:"pet_id,int"`
 	TagId int `db:"tag_id,int"`
-}
-
-type Order struct {
-	Id         int       `json:"id,int"`
-	PetId      int       `json:"petId,int"`
-	Quantity   int       `json:"quantity,int"`
-	ShipDate   time.Time `json:"shipDate"`
-	Status     string    `json:"status"` // placed | approved | delivered
-	IsComplete bool      `json:"complete"`
 }
