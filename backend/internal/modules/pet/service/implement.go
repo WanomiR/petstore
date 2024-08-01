@@ -78,13 +78,17 @@ func (s *PetService) UpdateWithForm(ctx context.Context, id int, name string, st
 	return nil
 }
 
-func (s *PetService) DeleteById(ctx context.Context, id int) error {
-	if _, err := s.GetById(ctx, id); err != nil {
-		return e.Wrap("couldn't get pet", err)
+func (s *PetService) Delete(ctx context.Context, id int) error {
+	if err := s.DB.DeletePet(ctx, id); err != nil {
+		return err
 	}
 
-	if err := s.DB.DeletePet(ctx, id); err != nil {
-		return e.Wrap("couldn't delete pet", err)
+	if err := s.DB.DeletePetTagsByPetId(ctx, id); err != nil {
+		return e.Wrap("couldn't delete pet tags", err)
+	}
+
+	if err := s.DB.DeletePhotoUrlsByPetId(ctx, id); err != nil {
+		return e.Wrap("couldn't delete photo urls", err)
 	}
 
 	return nil
@@ -202,6 +206,9 @@ func (s *PetService) Update(ctx context.Context, petUpdate entities.Pet) error {
 		}
 		// iterate over new photo urls
 		for _, url := range pet.PhotoUrls {
+			if url == "" || url == "string" {
+				continue
+			}
 			if err = s.DB.CreatePetPhotoUrl(ctx, pet.Id, url); err != nil {
 				return e.Wrap("couldn't create pet photo url", err)
 			}

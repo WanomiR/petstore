@@ -12,6 +12,30 @@ definitions:
     additionalProperties:
       type: integer
     type: object
+  entities.Order:
+    properties:
+      complete:
+        example: true
+        type: boolean
+      id:
+        type: integer
+      petId:
+        example: 1
+        type: integer
+      quantity:
+        example: 1
+        type: integer
+      shipDate:
+        example: "2024-08-01T07:25:40.698Z"
+        type: string
+      status:
+        description: placed | approved | delivered
+        example: placed
+        type: string
+    required:
+    - petId
+    - quantity
+    type: object
   entities.Pet:
     properties:
       category:
@@ -320,6 +344,85 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: get inventory
+      tags:
+      - store
+  /store/order:
+    post:
+      consumes:
+      - application/json
+      description: Place an order for a pet
+      parameters:
+      - description: Order placed for purchasing a pet
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: create order
+      tags:
+      - store
+  /store/order/{orderId}:
+    delete:
+      description: Delete purchase order by id
+      parameters:
+      - description: ID of the order that needs to be deleted
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: delete order
+      tags:
+      - store
+    get:
+      description: Fund purchase order by id
+      parameters:
+      - description: ID of order that needs to be fetched
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/rr.JSONResponse'
+      summary: get order
       tags:
       - store
   /user:

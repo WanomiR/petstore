@@ -3,12 +3,12 @@ package controller
 import (
 	"backend/internal/lib/e"
 	"backend/internal/lib/rr"
+	"backend/internal/lib/u"
 	"backend/internal/modules/user/entities"
 	"backend/internal/modules/user/service"
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 )
 
 type UserControl struct {
@@ -33,7 +33,7 @@ func NewUserController(service service.UserServicer, readResponder rr.ReadRespon
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /user/{username} [get]
 func (c *UserControl) GetByUsername(w http.ResponseWriter, r *http.Request) {
-	username := usernameFromPath(r.URL.Path)
+	username := u.ParamFromPath(r.URL.Path)
 
 	if username == "" {
 		_ = c.rr.WriteJSONError(w, errors.New("invalid username"))
@@ -62,7 +62,7 @@ func (c *UserControl) GetByUsername(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /user/{username} [put]
 func (c *UserControl) Update(w http.ResponseWriter, r *http.Request) {
-	username := usernameFromPath(r.URL.Path)
+	username := u.ParamFromPath(r.URL.Path)
 
 	if username == "" {
 		_ = c.rr.WriteJSONError(w, errors.New("invalid username"))
@@ -128,7 +128,7 @@ func (c *UserControl) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /user/{username} [delete]
 func (c *UserControl) Delete(w http.ResponseWriter, r *http.Request) {
-	username := usernameFromPath(r.URL.Path)
+	username := u.ParamFromPath(r.URL.Path)
 	ctx := r.Context()
 
 	if username == "" {
@@ -215,9 +215,4 @@ func (c *UserControl) Logout(w http.ResponseWriter, r *http.Request) {
 
 	resp := rr.JSONResponse{Error: false, Message: "user logged out"}
 	_ = c.rr.WriteJSON(w, 200, resp)
-}
-
-func usernameFromPath(path string) string {
-	parts := strings.Split(path, "/")
-	return parts[len(parts)-1]
 }

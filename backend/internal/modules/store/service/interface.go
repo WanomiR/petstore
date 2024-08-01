@@ -1,9 +1,12 @@
 package service
 
-import "backend/internal/modules/store/entities"
+import (
+	"backend/internal/modules/store/entities"
+	"context"
+)
 
 type StoreServicer interface {
-	CreateOrder(order entities.Order) (int, error)
-	GetOrderById(orderId int) (entities.Order, error)
-	DeleteOrder(orderId int) error
+	CreateOrder(ctx context.Context, order entities.Order) (int, error)
+	GetOrderById(ctx context.Context, orderId int) (entities.Order, error)
+	DeleteOrder(ctx context.Context, orderId int) error
 }

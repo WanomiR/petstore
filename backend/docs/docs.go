@@ -380,6 +380,126 @@ const docTemplate = `{
                 }
             }
         },
+        "/store/order": {
+            "post": {
+                "description": "Place an order for a pet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "store"
+                ],
+                "summary": "create order",
+                "parameters": [
+                    {
+                        "description": "Order placed for purchasing a pet",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entities.Order"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/store/order/{orderId}": {
+            "get": {
+                "description": "Fund purchase order by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "store"
+                ],
+                "summary": "get order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of order that needs to be fetched",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/entities.Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete purchase order by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "store"
+                ],
+                "summary": "delete order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the order that needs to be deleted",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/rr.JSONResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "post": {
                 "description": "Create user",
@@ -674,6 +794,39 @@ const docTemplate = `{
             "type": "object",
             "additionalProperties": {
                 "type": "integer"
+            }
+        },
+        "entities.Order": {
+            "type": "object",
+            "required": [
+                "petId",
+                "quantity"
+            ],
+            "properties": {
+                "complete": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "petId": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "shipDate": {
+                    "type": "string",
+                    "example": "2024-08-01T07:25:40.698Z"
+                },
+                "status": {
+                    "description": "placed | approved | delivered",
+                    "type": "string",
+                    "example": "placed"
+                }
             }
         },
         "entities.Pet": {

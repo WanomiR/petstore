@@ -3,6 +3,7 @@ package controller
 import (
 	"backend/internal/lib/e"
 	"backend/internal/lib/rr"
+	"backend/internal/lib/u"
 	"backend/internal/modules/pet/entities"
 	"backend/internal/modules/pet/service"
 	"errors"
@@ -35,8 +36,7 @@ func NewPetControl(service service.PetServicer, readResponder rr.ReadResponder) 
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet/{petId} [get]
 func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
+	id := u.ParamFromPath(r.URL.Path)
 
 	petId, err := strconv.Atoi(id)
 	if err != nil {
@@ -66,8 +66,7 @@ func (c *PetControl) GetById(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} rr.JSONResponse
 // @Router /pet/{petId} [post]
 func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
+	id := u.ParamFromPath(r.URL.Path)
 
 	petId, err := strconv.Atoi(id)
 	if err != nil {
@@ -105,8 +104,7 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet/{petId} [delete]
 func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
+	id := u.ParamFromPath(r.URL.Path)
 
 	petId, err := strconv.Atoi(id)
 	if err != nil {
@@ -114,8 +112,13 @@ func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = c.service.DeleteById(r.Context(), petId); err != nil {
-		_ = c.rr.WriteJSONError(w, err, 404)
+	if _, err = c.service.GetById(r.Context(), petId); err != nil {
+		_ = c.rr.WriteJSONError(w, e.Wrap("couldn't get pet", err), 404)
+		return
+	}
+
+	if err = c.service.Delete(r.Context(), petId); err != nil {
+		_ = c.rr.WriteJSONError(w, e.Wrap("couldn't delete pet", err))
 		return
 	}
 
@@ -136,8 +139,7 @@ func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet/{petId}/uploadImage [post]
 func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-2]
+	id := u.ParamFromPath(r.URL.Path)
 
 	petId, err := strconv.Atoi(id)
 	if err != nil {
