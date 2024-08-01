@@ -2,7 +2,7 @@ package controller
 
 import (
 	"backend/internal/lib/rr"
-	"backend/internal/modules/store/controller/mock_service"
+	"backend/internal/mocks/mock_store_service"
 	"backend/internal/modules/store/entities"
 	"bytes"
 	"context"
@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-//go:generate mockgen -source=../service/interface.go -destination=./mock_service/mock_service.go
+//go:generate mockgen -source=../service/interface.go -destination=../../../mocks/mock_store_service/mock_store_service.go
 
 func TestStoreControl_GetInventory(t *testing.T) {
 	controller := gomock.NewController(t)
