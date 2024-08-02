@@ -75,10 +75,7 @@ func (c *UserControl) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var userUpdate entities.User
-	if err := c.rr.ReadJSON(w, r, &userUpdate); err != nil {
-		_ = c.rr.WriteJSONError(w, e.Wrap("couldn't read json", err))
-		return
-	}
+	_ = c.rr.ReadJSON(w, r, &userUpdate)
 
 	if userUpdate.Username != username {
 		_ = c.rr.WriteJSONError(w, errors.New("username does not match"))
@@ -109,12 +106,13 @@ func (c *UserControl) Create(w http.ResponseWriter, r *http.Request) {
 	var user entities.User
 	_ = c.rr.ReadJSON(w, r, &user)
 
-	if err := c.service.Create(r.Context(), user); err != nil {
+	userId, err := c.service.Create(r.Context(), user)
+	if err != nil {
 		_ = c.rr.WriteJSONError(w, e.Wrap("couldn't create user", err))
 		return
 	}
 
-	resp := rr.JSONResponse{Error: false, Message: "user created"}
+	resp := rr.JSONResponse{Error: false, Message: fmt.Sprintf("user created, id: %d", userId)}
 	_ = c.rr.WriteJSON(w, 201, resp)
 }
 
@@ -165,13 +163,13 @@ func (c *UserControl) CreateWithArray(w http.ResponseWriter, r *http.Request) {
 	_ = c.rr.ReadJSON(w, r, &users)
 
 	for _, user := range users {
-		if err := c.service.Create(r.Context(), user); err != nil {
+		if _, err := c.service.Create(r.Context(), user); err != nil {
 			_ = c.rr.WriteJSONError(w, e.Wrap("couldn't create user "+user.Username, err))
 			return
 		}
 	}
 
-	resp := rr.JSONResponse{Error: false, Message: fmt.Sprintf("%d user created", len(users))}
+	resp := rr.JSONResponse{Error: false, Message: fmt.Sprintf("created %d users", len(users))}
 	_ = c.rr.WriteJSON(w, 201, resp)
 }
 
@@ -190,13 +188,13 @@ func (c *UserControl) Login(w http.ResponseWriter, r *http.Request) {
 	username := query.Get("username")
 	password := query.Get("password")
 
-	tokens, cookie, err := c.service.Authorize(r.Context(), username, password)
+	token, cookie, err := c.service.Authorize(r.Context(), username, password)
 	if err != nil {
 		_ = c.rr.WriteJSONError(w, e.Wrap("couldn't authorize user", err), 401)
 		return
 	}
 
-	resp := rr.JSONResponse{Error: false, Message: "user authorized", Data: tokens}
+	resp := rr.JSONResponse{Error: false, Message: "user authorized", Data: token}
 
 	http.SetCookie(w, cookie)
 	_ = c.rr.WriteJSON(w, 200, resp)

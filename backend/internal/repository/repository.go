@@ -8,6 +8,8 @@ import (
 	"database/sql"
 )
 
+//go:generate mockgen -source=./repository.go -destination=../mocks/mock_repository/mock_repository.go
+
 type Repository interface {
 	Connection() *sql.DB
 	UserRepository
@@ -44,6 +46,6 @@ type StoreRepository interface {
 type UserRepository interface {
 	GetUserByUsername(ctx context.Context, username string) (ue.User, error)
 	UpdateUser(ctx context.Context, user ue.User) error
-	CreateUser(ctx context.Context, user ue.User) error
+	CreateUser(ctx context.Context, user ue.User) (int, error)
 	DeleteUser(ctx context.Context, username string) error
 }

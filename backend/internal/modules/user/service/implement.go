@@ -61,22 +61,23 @@ func (s *UserService) Update(ctx context.Context, userUpdate entities.User) erro
 	return nil
 }
 
-func (s *UserService) Create(ctx context.Context, user entities.User) error {
+func (s *UserService) Create(ctx context.Context, user entities.User) (int, error) {
 	if user.Username == "" || user.Password == "" {
-		return errors.New("username and password are mandatory")
+		return 0, errors.New("username and password are mandatory")
 	}
 
 	if _, err := s.DB.GetUserByUsername(ctx, user.Username); err == nil {
-		return errors.New("user already exists")
+		return 0, errors.New("user already exists")
 	}
 
 	user.Password, _ = s.auth.EncryptPassword(user.Password)
 
-	if err := s.DB.CreateUser(ctx, user); err != nil {
-		return err
+	userId, err := s.DB.CreateUser(ctx, user)
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	return userId, nil
 
 }
 
