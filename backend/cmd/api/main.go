@@ -23,11 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go a.Serve()
+	go a.Start()
 
-	// waiting for a stop signal
-	<-a.Signal()
-
-	// graceful shutdown ...
-	_ = a.CloseDBConn()
+	a.Stop()
 }

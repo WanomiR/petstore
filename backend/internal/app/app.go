@@ -6,10 +6,10 @@ import (
 	"backend/internal/modules"
 	"backend/internal/repository"
 	"backend/internal/repository/dbrepo"
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -25,12 +25,8 @@ import (
 )
 
 type Server interface {
-	Serve()
-	Signal() <-chan os.Signal
-	readConfig(string) error
-	init() error
-	connectToDB() (*sql.DB, error)
-	routes() *chi.Mux
+	Start()
+	Stop()
 }
 
 type App struct {
@@ -57,7 +53,7 @@ func NewApp() (a *App, err error) {
 	return a, nil
 }
 
-func (a *App) Serve() {
+func (a *App) Start() {
 	defer a.DB.Connection().Close()
 
 	fmt.Println("Started server on port", a.Port)
@@ -66,12 +62,17 @@ func (a *App) Serve() {
 	}
 }
 
-func (a *App) Signal() <-chan os.Signal {
-	return a.signalChan
-}
+func (a *App) Stop() {
+	<-a.signalChan
 
-func (a *App) CloseDBConn() error {
-	return a.DB.Connection().Close()
+	a.DB.Connection().Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
+	<-ctx.Done()
+
+	fmt.Println("Shutting down server gracefully")
 }
 
 func (a *App) readConfig(envPath ...string) (err error) {

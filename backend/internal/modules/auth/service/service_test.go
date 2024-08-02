@@ -52,7 +52,6 @@ func TestAuthService_VerifyRequest(t *testing.T) {
 	})
 
 	req.Header.Set("Authorization", "Bear "+token)
-
 	t.Run("invalid header", func(t *testing.T) {
 		if _, _, err := as.VerifyRequest(wr, req); err == nil {
 			t.Errorf("VerifyRequest() error = %v, want %v", err, true)
