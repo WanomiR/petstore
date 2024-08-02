@@ -6,7 +6,6 @@ import (
 	"backend/internal/repository"
 	"context"
 	"errors"
-	"log"
 )
 
 type PetService struct {
@@ -49,8 +48,7 @@ func (s *PetService) GetById(ctx context.Context, id int) (pet entities.Pet, err
 	for _, pt := range petTagPairs {
 		var tag entities.Tag
 		if tag, err = s.DB.GetTagById(ctx, pt.TagId); err != nil {
-			log.Println("failed to get tag", err.Error())
-			continue
+			return entities.Pet{}, e.Wrap("failed to get tag", err)
 		}
 		pet.Tags = append(pet.Tags, tag)
 	}
@@ -83,6 +81,10 @@ func (s *PetService) UpdateWithForm(ctx context.Context, id int, name string, st
 }
 
 func (s *PetService) Delete(ctx context.Context, id int) error {
+	if _, err := s.GetById(ctx, id); err != nil {
+		return e.Wrap("couldn't get pet", err)
+	}
+
 	if err := s.DB.DeletePet(ctx, id); err != nil {
 		return err
 	}
@@ -257,7 +259,7 @@ func (s *PetService) GetByStatus(ctx context.Context, status string) ([]entities
 
 	pets, err := s.DB.GetPetsByStatus(ctx, status)
 	if err != nil {
-		return nil, e.Wrap("couldn't get pets by status", err)
+		return nil, err
 	}
 
 	result := make([]entities.Pet, 0, len(pets))

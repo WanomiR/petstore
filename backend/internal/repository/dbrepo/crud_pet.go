@@ -77,10 +77,12 @@ func (db *PostgresDBRepo) GetPetsByStatus(ctx context.Context, petStatus string)
 	ctx, cancel := context.WithTimeout(ctx, db.timeout)
 	defer cancel()
 
-	query := `SELECT id, category_id, name, status FROM pets WHERE status = $1`
+	query := `SELECT id, category_id, name, status FROM pets WHERE status = $1 AND is_deleted = FALSE`
 
 	rows, err := db.conn.QueryContext(ctx, query, petStatus)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return []entities.Pet{}, nil
+	} else if err != nil {
 		return nil, e.Wrap("failed to execute query", err)
 	}
 	defer rows.Close()
@@ -153,7 +155,9 @@ func (db *PostgresDBRepo) GetPhotoUrlsByPetId(ctx context.Context, petId int) ([
 	query := `SELECT id, pet_id, url FROM photo_urls WHERE pet_id = $1`
 
 	rows, err := db.conn.QueryContext(ctx, query, petId)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return []entities.PhotoUrl{}, nil
+	} else if err != nil {
 		return nil, e.Wrap("failed to execute query", err)
 	}
 	defer rows.Close()
@@ -269,7 +273,9 @@ func (db *PostgresDBRepo) GetPetTagPairsByPetId(ctx context.Context, petId int) 
 	query := `SELECT id, pet_id, tag_id FROM pet_tags WHERE pet_id = $1`
 
 	rows, err := db.conn.QueryContext(ctx, query, petId)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return []entities.PetTag{}, nil
+	} else if err != nil {
 		return nil, e.Wrap("failed to execute query", err)
 	}
 	defer rows.Close()
