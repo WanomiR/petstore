@@ -64,6 +64,10 @@ func (s *PetService) UpdateWithForm(ctx context.Context, id int, name string, st
 		return e.Wrap("couldn't get pet", err)
 	}
 
+	if name == "" && status == "" {
+		return errors.New("name and status can not be both empty")
+	}
+
 	if name != "" {
 		pet.Name = name
 	}

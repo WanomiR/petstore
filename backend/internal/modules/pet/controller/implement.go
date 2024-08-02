@@ -78,11 +78,6 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 	status := r.FormValue("status")
 
-	if name == "" && status == "" {
-		_ = c.rr.WriteJSONError(w, errors.New("at least one field must be not empty"))
-		return
-	}
-
 	if err = c.service.UpdateWithForm(r.Context(), petId, name, status); err != nil {
 		_ = c.rr.WriteJSONError(w, err)
 		return
@@ -93,7 +88,7 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// DeleteById godoc
+// Delete godoc
 // @Summary delete pet
 // @Security ApiKeyAuth
 // @Description Deletes a pet
@@ -103,7 +98,7 @@ func (c *PetControl) UpdateWithForm(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} rr.JSONResponse
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet/{petId} [delete]
-func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
+func (c *PetControl) Delete(w http.ResponseWriter, r *http.Request) {
 	id := u.ParamFromPath(r.URL.Path)
 
 	petId, err := strconv.Atoi(id)
@@ -139,7 +134,8 @@ func (c *PetControl) DeleteById(w http.ResponseWriter, r *http.Request) {
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet/{petId}/uploadImage [post]
 func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
-	id := u.ParamFromPath(r.URL.Path)
+	parts := strings.Split(r.URL.Path, "/")
+	id := parts[len(parts)-2]
 
 	petId, err := strconv.Atoi(id)
 	if err != nil {
@@ -163,7 +159,7 @@ func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
 	_ = c.rr.WriteJSON(w, 200, resp)
 }
 
-// CreatePet godoc
+// Create godoc
 // @Summary create pet
 // @Security ApiKeyAuth
 // @Description Add a new pet to the store
@@ -174,7 +170,7 @@ func (c *PetControl) UploadImage(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} rr.JSONResponse
 // @Failure 400 {object} rr.JSONResponse
 // @Router /pet [post]
-func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
+func (c *PetControl) Create(w http.ResponseWriter, r *http.Request) {
 	var pet entities.Pet
 	_ = c.rr.ReadJSON(w, r, &pet)
 
@@ -189,7 +185,7 @@ func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// UpdatePet godoc
+// Update godoc
 // @Summary update pet
 // @Security ApiKeyAuth
 // @Description Update an existing pet
@@ -200,7 +196,7 @@ func (c *PetControl) CreatePet(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} rr.JSONResponse
 // @Failure 400,404 {object} rr.JSONResponse
 // @Router /pet [put]
-func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {
+func (c *PetControl) Update(w http.ResponseWriter, r *http.Request) {
 	var pet entities.Pet
 	_ = c.rr.ReadJSON(w, r, &pet)
 
@@ -231,8 +227,8 @@ func (c *PetControl) UpdatePet(w http.ResponseWriter, r *http.Request) {
 func (c *PetControl) GetByStatus(w http.ResponseWriter, r *http.Request) {
 	statuses := strings.Split(r.URL.Query()["status"][0], ",")
 
-	if len(statuses) == 0 {
-		_ = c.rr.WriteJSONError(w, errors.New("at least one field must be filled"))
+	if len(statuses) == 0 || statuses[0] == "" {
+		_ = c.rr.WriteJSONError(w, errors.New("at least one status must be specified"))
 		return
 	}
 

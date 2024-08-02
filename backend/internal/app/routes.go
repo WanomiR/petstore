@@ -16,10 +16,10 @@ func (a *App) routes() *chi.Mux {
 		r.Use(a.requireAuthentication)
 		r.Get("/{petId}", a.controllers.Pet.GetById)
 		r.Post("/{petId}", a.controllers.Pet.UpdateWithForm)
-		r.Delete("/{petId}", a.controllers.Pet.DeleteById)
+		r.Delete("/{petId}", a.controllers.Pet.Delete)
 		r.Post("/{petId}/uploadImage", a.controllers.Pet.UploadImage)
-		r.Post("/", a.controllers.Pet.CreatePet)
-		r.Put("/", a.controllers.Pet.UpdatePet)
+		r.Post("/", a.controllers.Pet.Create)
+		r.Put("/", a.controllers.Pet.Update)
 		r.Get("/findByStatus", a.controllers.Pet.GetByStatus)
 	})
 
