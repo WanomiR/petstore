@@ -65,8 +65,6 @@ func (a *App) Start() {
 func (a *App) Stop() {
 	<-a.signalChan
 
-	a.DB.Connection().Close()
-
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
